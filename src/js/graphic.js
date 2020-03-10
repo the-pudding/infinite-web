@@ -12,6 +12,7 @@ function handleDataLoad(data) {
     tr.append("td").text(d => d.title);
     tr.append("td").text(d => d.odds);
     tr.append("td").text(d => d.apm);
+    tr.append("td").text(d => d.est);
     tr.append("td").text(d => (d.result ? d.result.attempts : "NA"));
     tr.append("td").text(d =>
       d.result && d.result.done ? d.result.end : "NA"
