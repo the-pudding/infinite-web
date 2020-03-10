@@ -13,13 +13,15 @@
 
 function loadFile(file) {
   return new Promise((resolve, reject) => {
-    const ext = file.split('.').pop();
-    if (ext === 'csv')
-      d3.csv(`assets/data/${file}`)
+    const [path] = file.split("?");
+    const ext = path.split(".").pop();
+    const base = file.includes("http") ? "" : "assets/data/";
+    if (ext === "csv")
+      d3.csv(`${base}${file}`)
         .then(resolve)
         .catch(reject);
-    else if (ext === 'json')
-      d3.json(`assets/data/${file}`)
+    else if (ext === "json")
+      d3.json(`${base}${file}`)
         .then(resolve)
         .catch(reject);
     else reject(new Error(`unsupported file type for: ${file}`));
@@ -27,7 +29,7 @@ function loadFile(file) {
 }
 
 export default function loadData(files) {
-  if (typeof files === 'string') return loadFile(files);
+  if (typeof files === "string") return loadFile(files);
   const loads = files.map(loadFile);
   return Promise.all(loads);
 }
