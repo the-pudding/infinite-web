@@ -10,10 +10,12 @@ function handleDataLoad(data) {
   const enter = e => {
     const tr = e.append("tr");
     tr.append("td").text(d => d.title);
-    tr.append("td").text(d => d.odds);
+    tr.append("td").text(d => d3.format(",")(d.odds));
     tr.append("td").text(d => d.est);
-    tr.append("td").text(d => d.apm);
-    tr.append("td").text(d => (d.result ? d.result.attempts : "NA"));
+    tr.append("td").text(d => d3.format(",")(d.apm));
+    tr.append("td").text(d =>
+      d.result ? d3.format(",")(d.result.attempts) : "NA"
+    );
     tr.append("td").text(d =>
       d.result && d.result.done ? d.result.end : "NA"
     );
