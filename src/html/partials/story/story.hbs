@@ -1,0 +1,10 @@
+<article>
+    {{#each doc.content}}
+    {{#if text}}
+    <p>{{{text}}}</p>
+    {{/if}}
+    {{#if graphic}}
+    <div class={{{graphic}}} data-type={{{type}}}></div>
+    {{/if}}
+    {{/each}}
+</article>
