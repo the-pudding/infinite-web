@@ -1,0 +1,31 @@
+<svg width="524" height="524" viewBox="0 0 524 524" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="piano_frame">
+<rect width="524" height="524" fill="white"/>
+<g id="piano">
+<rect id="key_48" x="356.5" y="356.5" width="24" height="147" transform="rotate(-90 356.5 356.5)" fill="white" stroke="black"/>
+<rect id="key_50" x="356.5" y="332.5" width="24" height="147" transform="rotate(-90 356.5 332.5)" fill="white" stroke="black"/>
+<rect id="key_52" x="356.5" y="308.5" width="24" height="147" transform="rotate(-90 356.5 308.5)" fill="white" stroke="black"/>
+<rect id="key_53" x="356.5" y="284.5" width="24" height="147" transform="rotate(-90 356.5 284.5)" fill="white" stroke="black"/>
+<rect id="key_55" x="356.5" y="260.5" width="24" height="147" transform="rotate(-90 356.5 260.5)" fill="white" stroke="black"/>
+<rect id="key_57" x="356.5" y="236.5" width="24" height="147" transform="rotate(-90 356.5 236.5)" fill="white" stroke="black"/>
+<rect id="key_59" x="356.5" y="212.5" width="24" height="147" transform="rotate(-90 356.5 212.5)" fill="white" stroke="black"/>
+<rect id="key_60" x="356.5" y="188.5" width="24" height="147" transform="rotate(-90 356.5 188.5)" fill="white" stroke="black"/>
+<rect id="key_62" x="356.5" y="164.5" width="24" height="147" transform="rotate(-90 356.5 164.5)" fill="white" stroke="black"/>
+<rect id="key_64" x="356.5" y="140.5" width="24" height="147" transform="rotate(-90 356.5 140.5)" fill="white" stroke="black"/>
+<rect id="key_65" x="356.5" y="116.5" width="24" height="147" transform="rotate(-90 356.5 116.5)" fill="white" stroke="black"/>
+<rect id="key_67" x="356.5" y="92.5" width="24" height="147" transform="rotate(-90 356.5 92.5)" fill="white" stroke="black"/>
+<rect id="key_69" x="356.5" y="68.5" width="24" height="147" transform="rotate(-90 356.5 68.5)" fill="white" stroke="black"/>
+<rect id="key_71" x="356.5" y="44.5" width="24" height="147" transform="rotate(-90 356.5 44.5)" fill="white" stroke="black"/>
+<rect id="key_49" x="357" y="342" width="20" height="103" transform="rotate(-90 357 342)" fill="black"/>
+<rect id="key_51" x="357" y="318" width="20" height="103" transform="rotate(-90 357 318)" fill="black"/>
+<rect id="key_54" x="357" y="270" width="20" height="103" transform="rotate(-90 357 270)" fill="black"/>
+<rect id="key_56" x="357" y="246" width="20" height="103" transform="rotate(-90 357 246)" fill="black"/>
+<rect id="key_58" x="357" y="222" width="20" height="103" transform="rotate(-90 357 222)" fill="black"/>
+<rect id="key_61" x="357" y="174" width="20" height="103" transform="rotate(-90 357 174)" fill="black"/>
+<rect id="key_63" x="357" y="150" width="20" height="103" transform="rotate(-90 357 150)" fill="black"/>
+<rect id="key_66" x="357" y="102" width="20" height="103" transform="rotate(-90 357 102)" fill="black"/>
+<rect id="key_68" x="357" y="78" width="20" height="103" transform="rotate(-90 357 78)" fill="black"/>
+<rect id="key_70" x="357" y="54" width="20" height="103" transform="rotate(-90 357 54)" fill="black"/>
+</g>
+</g>
+</svg>
