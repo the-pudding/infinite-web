@@ -36,8 +36,9 @@ d3.selection.prototype.noteChart = function init(options) {
         // helper functions
 
         function generatePiano() {
-            const range = data.range.midis;
-            console.log({ range, data });
+            const { midis } = data.range;
+            const range = d3.range(midis[0], midis[1]);
+            console.log({ range, data, test: d3.range(0, 5) });
         }
 
         const Chart = {
