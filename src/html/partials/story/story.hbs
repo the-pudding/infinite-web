@@ -1,11 +1,10 @@
-<article>
+<article id="story">
     {{#each doc.content}}
     {{#if text}}
     <p>{{{text}}}</p>
     {{/if}}
     {{#if graphic}}
-    <div class={{{graphic}}} data-type={{{type}}}>
-        <img inline src='piano_frame.svg'>
+    <div class='{{{graphic}}}__container' data-type={{{type}}}>
     </div>
     {{/if}}
     {{/each}}
