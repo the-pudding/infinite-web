@@ -30,13 +30,22 @@ function setupCharts() {
 
 function findKeys(range) {
     const midisSorted = range.sort(d3.ascending);
-    const allMidis = d3.range(midisSorted[0], midisSorted[1]);
+    const endMidis = d3.extent(midisSorted);
+    const allMidis = d3.range(endMidis[0], endMidis[1]);
 
     // find all octaves represented
     const octaves = allMidis.map(d => cwMap.get(d)).filter(d => d);
     const uniqueOctaves = findUnique(octaves);
 
-    const keys = crosswalk.filter(d => uniqueOctaves.includes(d.octave));
+    // ensure full range encapsulated
+    const allOctaves = d3.range(
+        Math.min(...uniqueOctaves),
+        Math.max(...uniqueOctaves) + 1
+    );
+
+    const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
+
+    console.log({ range, endMidis, allMidis, uniqueOctaves, allOctaves, keys });
 
     return keys;
 }

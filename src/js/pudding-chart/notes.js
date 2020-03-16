@@ -28,12 +28,18 @@ d3.selection.prototype.noteChart = function init(options) {
         const MARGIN_BOTTOM = 0;
         const MARGIN_LEFT = 0;
         const MARGIN_RIGHT = 0;
+        // height of white keys
+        let whiteHeight = 0;
 
         // scales
         const scaleX = null;
         const scaleY = null;
 
         // helper functions
+
+        function findUnique(arr) {
+            return [...new Set(arr)];
+        }
 
         function generatePiano() {
             const { keys } = data;
@@ -46,14 +52,9 @@ d3.selection.prototype.noteChart = function init(options) {
             const HEIGHT_RATIO = 0.6;
             const whiteWidth = Math.round(PIANO_WIDTH / whiteKeys);
             const blackWidth = Math.round(whiteWidth * WIDTH_RATIO);
-            const whiteHeight = Math.round(whiteWidth / WIDTH_TO_HEIGHT_RATIO);
+
+            whiteHeight = Math.round(whiteWidth / WIDTH_TO_HEIGHT_RATIO);
             const blackHeight = Math.round(whiteHeight * HEIGHT_RATIO);
-            console.log({
-                minCheck: width - whiteHeight,
-                whiteHeight,
-                blackHeight,
-                whiteWidth,
-            });
 
             // how many white keys came before this key?
             const numLowerWhites = midi =>
@@ -109,6 +110,9 @@ d3.selection.prototype.noteChart = function init(options) {
                 $vis.attr('transform', `translate(${MARGIN_LEFT}, ${MARGIN_TOP})`);
                 const pianoData = generatePiano();
 
+                const activeKeys = findUnique(data.sequence.map(d => d.midi));
+                console.log({ pianoData, activeKeys });
+
                 const $piano = $vis.append('g').attr('class', 'g-piano');
 
                 $piano
@@ -124,11 +128,20 @@ d3.selection.prototype.noteChart = function init(options) {
                             .attr('y', d => d.coord.y.min)
                             .attr('width', d => d.coord.x.max - d.coord.x.min)
                             .attr('height', d => d.coord.y.max - d.coord.y.min)
-                            .attr('data-midi', d => d.midi);
+                            .attr('data-midi', d => d.midi)
+                            .classed('active', d => activeKeys.includes(d.midi));
 
                         // raise black keys on top of white ones in DOM
                         $vis.selectAll('.key__black').raise();
                     });
+
+                const $guide = $vis.append('g').attr('class', 'g-guide');
+
+                console.log({ data });
+
+                // $guide
+                //     .selectAll('.guide')
+                //     .data(data)
 
                 return Chart;
             },

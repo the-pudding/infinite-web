@@ -4,6 +4,10 @@
         stroke $off-black 
         stroke-width 1px
         &__white 
-            fill $white 
+            fill rgba($gray-light, 0.5) 
+            &.active
+                fill rgba($white, 1)
         &__black 
-            fill $off-black
+            fill rgba($gray, 0.5)
+            &.active 
+                fill rgba($off-black, 1)
