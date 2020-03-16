@@ -21,7 +21,11 @@ function setupCharts() {
     const setupPianos = ['two', 'animated', 'results', 'success'];
     if (setupPianos.includes(condition))
         specificData = data.levels.filter(d => d.title === 'Symphony No. 5 I')[0];
+    else if (condition === 'Meryl')
+        specificData = data.levels.filter(d => d.title === 'Symphony No. 5  II')[0];
     else specificData = data.levels.filter(d => d.title === 'Louie Louie')[0];
+
+    console.log({ specificData });
 
     const chart = $sel.data([specificData]).noteChart();
     chart.resize().render();
