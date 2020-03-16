@@ -1,4 +1,5 @@
 import loadData from './load-data';
+import findUnique from './utils/unique';
 import './pudding-chart/notes';
 
 const $section = d3.select('#story');
@@ -7,24 +8,37 @@ const charts = [];
 
 let data = [];
 let crosswalk = [];
-console.log({ crosswalk });
+let cwMap = [];
 
 function setupCharts() {
     const $sel = d3.select(this);
     const condition = $sel.attr('data-type');
     let specificData = [];
 
-    console.log({ data });
+    console.log({ check: data });
+
     // separate out phases for the first few steps which repeat the same piano
     const setupPianos = ['two', 'animated', 'results', 'success'];
     if (setupPianos.includes(condition))
-        specificData = data.levels.filter(d => d.title === "Beethoven's 5th I")[0];
-    else specificData = data.levels.filter(d => d.title === 'Symphony No. 5')[0];
+        specificData = data.levels.filter(d => d.title === 'Symphony No. 5 I')[0];
+    else specificData = data.levels.filter(d => d.title === 'Louie Louie')[0];
 
     const chart = $sel.data([specificData]).noteChart();
-    console.log({ chart, lev: data.levels });
     chart.resize().render();
     charts.push(chart);
+}
+
+function findKeys(range) {
+    const midisSorted = range.sort(d3.ascending);
+    const allMidis = d3.range(midisSorted[0], midisSorted[1]);
+
+    // find all octaves represented
+    const octaves = allMidis.map(d => cwMap.get(d)).filter(d => d);
+    const uniqueOctaves = findUnique(octaves);
+
+    const keys = crosswalk.filter(d => uniqueOctaves.includes(d.octave));
+
+    return keys;
 }
 
 function cleanCrosswalk(cw) {
@@ -34,6 +48,27 @@ function cleanCrosswalk(cw) {
         sharp: d.note.includes('#'),
         octave: +d.octave,
     }));
+
+    const cwData = cleaned.map(d => [d.midi, d.octave]);
+    cwMap = new Map(cwData);
+
+    return cleaned;
+}
+
+function cleanData(dat) {
+    const cleanedLevels = dat.levels.map(d => ({
+        ...d,
+        keys: findKeys(d.range.midis),
+    }));
+
+    console.log({ cleanedLevels, dat });
+
+    const cleaned = [dat].map(d => ({
+        ...d,
+        levels: cleanedLevels,
+    }))[0];
+
+    console.log({ cleaned });
 
     return cleaned;
 }
@@ -45,9 +80,11 @@ function init() {
     loadData([dataURL, './crosswalk.csv'])
         .then(result => {
             console.log({ result });
-            data = result[0];
             crosswalk = cleanCrosswalk(result[1]);
-            console.log({ crosswalk });
+            return result[0];
+        })
+        .then(result => {
+            data = cleanData(result);
             $pianos.each(setupCharts);
         })
         .catch(console.log);

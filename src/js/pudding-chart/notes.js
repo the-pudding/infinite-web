@@ -36,9 +36,43 @@ d3.selection.prototype.noteChart = function init(options) {
         // helper functions
 
         function generatePiano() {
-            const { midis } = data.range;
-            const range = d3.range(midis[0], midis[1]);
-            console.log({ range, data, test: d3.range(0, 5) });
+            const { keys } = data;
+            // how many white keys are there total?
+            const whiteKeys = keys.filter(d => d.sharp === false).length;
+
+            const PIANO_WIDTH = height * 0.75;
+            const WIDTH_RATIO = 0.7;
+            const WIDTH_TO_HEIGHT_RATIO = 0.6;
+            const whiteWidth = PIANO_WIDTH / whiteKeys;
+            const blackWidth = whiteWidth * WIDTH_RATIO;
+
+            // how many white keys came before this key?
+            const numLowerWhites = midi =>
+                keys.filter(e => e.midi < midi && e.sharp === false).length;
+
+            // return an updated array with key coordinates
+            return keys.map((d, i) => {
+                // if the keys are sharp/black offset them
+                const offset = d.sharp === false ? 0 : -blackWidth / 2;
+
+                return {
+                    ...d,
+                    coord: {
+                        y: {
+                            min: whiteWidth * numLowerWhites(d.midi) + offset,
+                            max:
+                                whiteWidth * numLowerWhites(d.midi) +
+                                offset +
+                                (d.sharp === false ? whiteWidth : blackWidth),
+                        },
+                        x: {
+                            min: width * 0.75,
+                            // min: d.sharp === false ? 0 : (1 - HEIGHT_RATIO) * width,
+                            max: d.sharp === false ? width : width * 0.9,
+                        },
+                    },
+                };
+            });
         }
 
         const Chart = {
@@ -63,7 +97,27 @@ d3.selection.prototype.noteChart = function init(options) {
             render() {
                 // offset chart for margins
                 $vis.attr('transform', `translate(${MARGIN_LEFT}, ${MARGIN_TOP})`);
-                generatePiano();
+                const pianoData = generatePiano();
+
+                const $piano = $vis.append('g').attr('class', 'g-piano');
+
+                $piano
+                    .selectAll('.key')
+                    .data(pianoData)
+                    .join(enter => {
+                        enter
+                            .append('rect')
+                            .attr('class', d =>
+                                d.sharp === true ? `key key__black` : `key key__white`
+                            )
+                            .attr('x', d => d.coord.x.min)
+                            .attr('y', d => d.coord.y.min)
+                            .attr('width', d => d.coord.x.max - d.coord.x.min)
+                            .attr('height', d => d.coord.y.max - d.coord.y.min)
+                            .attr('data-midi', d => d.midi);
+
+                        const $blackKeys = $vis.selectAll('.key__black').raise();
+                    });
 
                 return Chart;
             },
