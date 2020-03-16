@@ -40,11 +40,20 @@ d3.selection.prototype.noteChart = function init(options) {
             // how many white keys are there total?
             const whiteKeys = keys.filter(d => d.sharp === false).length;
 
-            const PIANO_WIDTH = height * 0.75;
+            const PIANO_WIDTH = height * 0.6;
             const WIDTH_RATIO = 0.7;
-            const WIDTH_TO_HEIGHT_RATIO = 0.6;
-            const whiteWidth = PIANO_WIDTH / whiteKeys;
-            const blackWidth = whiteWidth * WIDTH_RATIO;
+            const WIDTH_TO_HEIGHT_RATIO = 0.2;
+            const HEIGHT_RATIO = 0.6;
+            const whiteWidth = Math.round(PIANO_WIDTH / whiteKeys);
+            const blackWidth = Math.round(whiteWidth * WIDTH_RATIO);
+            const whiteHeight = Math.round(whiteWidth / WIDTH_TO_HEIGHT_RATIO);
+            const blackHeight = Math.round(whiteHeight * HEIGHT_RATIO);
+            console.log({
+                minCheck: width - whiteHeight,
+                whiteHeight,
+                blackHeight,
+                whiteWidth,
+            });
 
             // how many white keys came before this key?
             const numLowerWhites = midi =>
@@ -66,9 +75,10 @@ d3.selection.prototype.noteChart = function init(options) {
                                 (d.sharp === false ? whiteWidth : blackWidth),
                         },
                         x: {
-                            min: width * 0.75,
+                            min: width - whiteHeight,
                             // min: d.sharp === false ? 0 : (1 - HEIGHT_RATIO) * width,
-                            max: d.sharp === false ? width : width * 0.9,
+                            max:
+                                d.sharp === false ? width : width - (whiteHeight - blackHeight),
                         },
                     },
                 };
@@ -116,7 +126,8 @@ d3.selection.prototype.noteChart = function init(options) {
                             .attr('height', d => d.coord.y.max - d.coord.y.min)
                             .attr('data-midi', d => d.midi);
 
-                        const $blackKeys = $vis.selectAll('.key__black').raise();
+                        // raise black keys on top of white ones in DOM
+                        $vis.selectAll('.key__black').raise();
                     });
 
                 return Chart;
