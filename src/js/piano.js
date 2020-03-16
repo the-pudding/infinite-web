@@ -103,6 +103,8 @@ function init() {
         .catch(console.log);
 }
 
-function resize() { }
+function resize() {
+    charts.forEach(chart => chart.resize().render());
+}
 
 export default { init, resize };

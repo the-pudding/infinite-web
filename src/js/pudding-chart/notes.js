@@ -46,25 +46,33 @@ d3.selection.prototype.noteChart = function init(options) {
 
         function generatePiano() {
             const { keys } = data;
-            // how many white keys are there total?
-            const whiteKeys = keys.filter(d => d.sharp === false).length;
+            const numKeys = keys.length;
 
-            const PIANO_WIDTH = height * 0.6;
-            const WIDTH_RATIO = 0.7;
             const WIDTH_TO_HEIGHT_RATIO = 0.2;
+            const idealWidth = width * 0.25 * WIDTH_TO_HEIGHT_RATIO;
+            // does the ideal width make the piano too tall?
+            const tooTall = idealWidth * numKeys > height;
+            const PIANO_HEIGHT = tooTall
+                ? // if so, figure out the widest each key can be
+                height / numKeys / WIDTH_TO_HEIGHT_RATIO
+                : // otherwise, scale the piano's height based on taking up 1/4 of the svg width
+                width * 0.25;
+            // const PIANO_WIDTH = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO;
+            const WIDTH_RATIO = 0.7;
             const HEIGHT_RATIO = 0.6;
-            whiteWidth = Math.round(PIANO_WIDTH / whiteKeys);
+            whiteWidth = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO; // Math.round(PIANO_WIDTH / whiteKeys);
             const blackWidth = Math.round(whiteWidth * WIDTH_RATIO);
 
-            whiteHeight = Math.round(whiteWidth / WIDTH_TO_HEIGHT_RATIO);
-            const blackHeight = Math.round(whiteHeight * HEIGHT_RATIO);
+            whiteHeight = PIANO_HEIGHT;
+            const blackHeight = PIANO_HEIGHT * HEIGHT_RATIO;
+            console.log({ width, whiteHeight, blackHeight });
 
             // how many white keys came before this key?
             const numLowerWhites = midi =>
                 keys.filter(e => e.midi < midi && e.sharp === false).length;
 
             // return an updated array with key coordinates
-            return keys.map((d, i) => {
+            return keys.map(d => {
                 // if the keys are sharp/black offset them
                 const offset = d.sharp === false ? 0 : -blackWidth / 2;
 
@@ -108,6 +116,12 @@ d3.selection.prototype.noteChart = function init(options) {
 
                 // setup viz group
                 $vis = $svg.append('g').attr('class', 'g-vis');
+
+                // setup group for piano
+                $vis.append('g').attr('class', 'g-piano');
+
+                // setup group for guide
+                $vis.append('g').attr('class', 'g-guide');
             },
             // on resize, update new dimensions
             resize() {
@@ -132,27 +146,26 @@ d3.selection.prototype.noteChart = function init(options) {
                 const activeKeys = findUnique(data.sequence.map(d => d.midi));
 
                 // append the piano
-                const $piano = $vis.append('g').attr('class', 'g-piano');
-
-                $piano
+                $vis
+                    .select('.g-piano')
                     .selectAll('.key')
-                    .data(pianoData)
-                    .join(enter => {
+                    .data(pianoData, d => d.midi)
+                    .join(enter =>
                         enter
                             .append('rect')
                             .attr('class', d =>
                                 d.sharp === true ? `key key__black` : `key key__white`
                             )
-                            .attr('x', d => d.coord.x.min)
-                            .attr('y', d => d.coord.y.min)
-                            .attr('width', d => d.coord.x.max - d.coord.x.min)
-                            .attr('height', d => d.coord.y.max - d.coord.y.min)
                             .attr('data-midi', d => d.midi)
-                            .classed('active', d => activeKeys.includes(d.midi));
+                            .classed('active', d => activeKeys.includes(d.midi))
+                    )
+                    .attr('x', d => d.coord.x.min)
+                    .attr('y', d => d.coord.y.min)
+                    .attr('width', d => d.coord.x.max - d.coord.x.min)
+                    .attr('height', d => d.coord.y.max - d.coord.y.min);
 
-                        // raise black keys on top of white ones in DOM
-                        $vis.selectAll('.key__black').raise();
-                    });
+                // raise black keys on top of white ones in DOM
+                $vis.selectAll('.key__black').raise();
 
                 // setup scales for sequence guides
                 const durations = guideData.map(d => d.duration);
@@ -166,20 +179,15 @@ d3.selection.prototype.noteChart = function init(options) {
                     ]);
 
                 // append the sequence guides
-                const $guide = $vis.append('g').attr('class', 'g-guide');
-
-                $guide
+                $vis
+                    .select('.g-guide')
                     .selectAll('.guide')
                     .data(guideData)
-                    .join(enter =>
-                        enter
-                            .append('rect')
-                            .attr('class', 'guide')
-                            .attr('x', (d, i) => scaleXGuide(i))
-                            .attr('y', d => d.coord.y.min)
-                            .attr('width', d => scaleGuideBlock(1 / d.duration))
-                            .attr('height', d => d.coord.y.max - d.coord.y.min)
-                    );
+                    .join(enter => enter.append('rect').attr('class', 'guide'))
+                    .attr('x', (d, i) => scaleXGuide(i))
+                    .attr('y', d => d.coord.y.min)
+                    .attr('width', d => scaleGuideBlock(1 / d.duration))
+                    .attr('height', d => d.coord.y.max - d.coord.y.min);
 
                 return Chart;
             },
