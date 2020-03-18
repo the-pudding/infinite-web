@@ -33,6 +33,7 @@ d3.selection.prototype.noteChart = function init(options) {
         let whiteHeight = 0;
         // width of white keys
         let whiteWidth = 0;
+        const PADDING = 10;
 
         // animation constants
         const DURATION = 500;
@@ -183,13 +184,13 @@ d3.selection.prototype.noteChart = function init(options) {
             const $finished = $gSeq.selectAll('[data-status="finished"]').nodes();
             console.log({ $finished });
             $finished.forEach((g, index) => {
-                const test = d3.select(g);
-                console.log({ test, g });
+                const played = d3.select(g);
                 const slot = $finished.length - index;
-                test
+                console.log({ whiteHeight });
+                played
                     .transition()
                     .duration(DURATION)
-                    .attr('transform', `translate(0, ${whiteHeight * slot})`);
+                    .attr('transform', `translate(0, ${(whiteWidth + PADDING) * slot})`);
             });
         }
 
