@@ -66,7 +66,13 @@ d3.selection.prototype.noteChart = function init(options) {
 
         function findDuration() {
             const correctSeq = data.sequence;
-            DELAY = correctSeq.map(d => Math.floor(BEAT_LENGTH / d.duration));
+            // quarter note = 1 beat
+            // notes length = Math.pow(2, d.duration)
+            // beat length * (4 / note length)
+            DELAY = correctSeq.map(d =>
+                Math.floor(BEAT_LENGTH * (4 / 2 ** d.duration))
+            );
+            console.log({ DELAY });
             DURATION = d3.sum(DELAY);
         }
 
@@ -181,12 +187,13 @@ d3.selection.prototype.noteChart = function init(options) {
             // select the note
             const note = d3.select(this);
             const index = note.attr('data-order');
+            const thisDelay = d3.sum(DELAY.slice(0, index));
 
             // animate it
             note
                 .transition()
                 .duration(DURATION)
-                .delay(DELAY[index] * index)
+                .delay(thisDelay)
                 .attr('x', scaleXGuide(index));
         }
 
