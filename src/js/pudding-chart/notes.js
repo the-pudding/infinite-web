@@ -36,8 +36,16 @@ d3.selection.prototype.noteChart = function init(options) {
         const PADDING = 10;
 
         // animation constants
-        const DURATION = 500;
-        const DELAY = 50;
+        let DURATION = 0;
+        let DELAY = 0;
+
+        // assuming 120 beats per minute (2 per second or 30 whole notes per minute)
+        // assuming 4/4 tempo
+        // 1 measure = 1 whole note
+        // 1 measure in 2 seconds
+        const BPM = data.tempo;
+        const minute = 60000;
+        const BEAT_LENGTH = Math.floor(minute / BPM);
 
         // sequences that have already played
         const finishedSeq = [];
@@ -51,6 +59,12 @@ d3.selection.prototype.noteChart = function init(options) {
 
         function findUnique(arr) {
             return [...new Set(arr)];
+        }
+
+        function findDuration() {
+            const correctSeq = data.sequence;
+            DELAY = correctSeq.map(d => Math.floor(BEAT_LENGTH / d.duration));
+            DURATION = d3.sum(DELAY);
         }
 
         function generatePiano() {
@@ -160,7 +174,7 @@ d3.selection.prototype.noteChart = function init(options) {
             note
                 .transition()
                 .duration(DURATION)
-                .delay(DELAY * index)
+                .delay(DELAY[index] * index)
                 .attr('x', scaleXGuide(index));
         }
 
@@ -182,11 +196,11 @@ d3.selection.prototype.noteChart = function init(options) {
             $sequences.attr('data-status', 'finished');
 
             const $finished = $gSeq.selectAll('[data-status="finished"]').nodes();
-            console.log({ $finished });
             $finished.forEach((g, index) => {
                 const played = d3.select(g);
                 const slot = $finished.length - index;
-                console.log({ whiteHeight });
+                console.log({ DURATION });
+
                 played
                     .transition()
                     .duration(DURATION)
@@ -197,6 +211,7 @@ d3.selection.prototype.noteChart = function init(options) {
         const Chart = {
             // called once at start
             init() {
+                findDuration();
                 $svg = $chart.append('svg').attr('class', 'graphic__piano');
 
                 // setup viz group
@@ -287,7 +302,7 @@ d3.selection.prototype.noteChart = function init(options) {
                 if (data.result) {
                     const results = data.result.recent;
                     let seqPromise = Promise.resolve();
-                    const interval = DURATION + DELAY * results.length;
+                    const interval = DURATION * results.length;
 
                     const filteredResults = results.filter(d => d.length > 1);
 
