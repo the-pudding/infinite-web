@@ -17,9 +17,27 @@ function setupCharts() {
 
     // separate out phases for the first few steps which repeat the same piano
     const setupPianos = ['two', 'animated', 'results', 'success'];
-    if (setupPianos.includes(condition))
-        specificData = data.levels.filter(d => d.title === 'Symphony No. 5 I')[0];
-    else if (condition === 'Meryl')
+    if (setupPianos.includes(condition)) {
+        const filteredData = data.levels.filter(
+            d => d.title === 'Symphony No. 5 I'
+        )[0];
+        if (condition === 'animated') {
+            console.log({ filteredData });
+            specificData = [filteredData].map(d => {
+                return {
+                    ...d,
+                    result: [d.result].map(e => {
+                        console.log({ e });
+                        return {
+                            ...e,
+                            recent: [e.recent[0]],
+                        };
+                    })[0],
+                };
+            })[0];
+        } else specificData = filteredData;
+        console.log({ specificData });
+    } else if (condition === 'Meryl')
         specificData = data.levels.filter(d => d.title === 'Symphony No. 5  II')[0];
     else specificData = data.levels.filter(d => d.title === 'Ice Ice Baby')[0];
 

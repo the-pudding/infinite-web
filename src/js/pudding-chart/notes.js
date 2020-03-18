@@ -54,6 +54,9 @@ d3.selection.prototype.noteChart = function init(options) {
         const scaleXGuide = d3.scaleBand();
         const scaleGuideBlock = d3.scaleLinear();
         const scaleY = null;
+        const scaleColor = d3
+            .scaleOrdinal()
+            .range(['#FF533D', '#4717F6', '#E5E338', '#A239CA', '#34A29E']);
 
         // helper functions
 
@@ -131,6 +134,13 @@ d3.selection.prototype.noteChart = function init(options) {
             return updatedSeq;
         }
 
+        function isCorrect(note, index) {
+            return (
+                note.midi === data.sequence[index].midi &&
+                note.duration === data.sequence[index].duration
+            );
+        }
+
         function setupNoteGroup(sequence, index) {
             // add location data to played notes
             const seqLoc = sequence.map(d => ({
@@ -156,10 +166,12 @@ d3.selection.prototype.noteChart = function init(options) {
                         .attr('class', 'note')
                         .attr('data-order', (d, i) => i)
                 )
-                .attr('x', width)
+                .attr('x', width * 0.9)
                 .attr('y', d => d.coord.y.min)
                 .attr('width', d => scaleGuideBlock(1 / d.duration))
-                .attr('height', d => d.coord.y.max - d.coord.y.min);
+                .attr('height', d => d.coord.y.max - d.coord.y.min)
+                .style('fill', d => scaleColor(d.midi))
+                .classed('is-correct', (d, i) => isCorrect(d, i));
 
             // for each note, play it
             $notes.each(playNote);
@@ -190,7 +202,7 @@ d3.selection.prototype.noteChart = function init(options) {
 
             notes
                 .transition()
-                .duration(DURATION)
+                .duration(200)
                 .attr('y', height * 0.5);
 
             $sequences.attr('data-status', 'finished');
@@ -199,11 +211,10 @@ d3.selection.prototype.noteChart = function init(options) {
             $finished.forEach((g, index) => {
                 const played = d3.select(g);
                 const slot = $finished.length - index;
-                console.log({ DURATION });
 
                 played
                     .transition()
-                    .duration(DURATION)
+                    .duration(200)
                     .attr('transform', `translate(0, ${(whiteWidth + PADDING) * slot})`);
             });
         }
@@ -217,14 +228,14 @@ d3.selection.prototype.noteChart = function init(options) {
                 // setup viz group
                 $vis = $svg.append('g').attr('class', 'g-vis');
 
-                // setup group for piano
-                $vis.append('g').attr('class', 'g-piano');
-
                 // setup group for guide
                 $vis.append('g').attr('class', 'g-guide');
 
                 // setup group for notes
                 $gSeq = $vis.append('g').attr('class', 'g-notes');
+
+                // setup group for piano
+                $vis.append('g').attr('class', 'g-piano');
             },
             // on resize, update new dimensions
             resize() {
@@ -247,6 +258,9 @@ d3.selection.prototype.noteChart = function init(options) {
 
                 // find which keys are used in current sequence
                 const activeKeys = findUnique(data.sequence.map(d => d.midi));
+
+                // set color scale
+                scaleColor.domain(activeKeys);
 
                 // create a key map
                 const keyCoord = guideData.map(d => [d.midi, d.coord]);
@@ -296,13 +310,15 @@ d3.selection.prototype.noteChart = function init(options) {
                     .attr('x', (d, i) => scaleXGuide(i))
                     .attr('y', d => d.coord.y.min)
                     .attr('width', d => scaleGuideBlock(1 / d.duration))
-                    .attr('height', d => d.coord.y.max - d.coord.y.min);
+                    .attr('height', d => d.coord.y.max - d.coord.y.min)
+                    .style('stroke', d => scaleColor(d.midi));
 
                 // if results have already been generated
                 if (data.result) {
                     const results = data.result.recent;
                     let seqPromise = Promise.resolve();
-                    const interval = DURATION * results.length;
+                    const interval = DURATION * 2;
+                    console.log({ data, results });
 
                     const filteredResults = results.filter(d => d.length > 1);
 

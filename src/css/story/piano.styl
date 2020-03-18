@@ -12,10 +12,11 @@
             &.active 
                 fill rgba($off-black, 1)
     .guide 
-        stroke red
         stroke-width 1px
         stroke-dasharray 4
         fill none
 
     .note 
-        fill $off-black
+        opacity 0.2
+        &.is-correct 
+            opacity 1
