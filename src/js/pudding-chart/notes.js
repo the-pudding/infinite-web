@@ -14,24 +14,32 @@ d3.selection.prototype.noteChart = function init(options) {
         // dom elements
         const $chart = d3.select(el);
         let $svg = null;
+        let $gSeq = null;
         const $axis = null;
         let $vis = null;
 
         // data
         let data = $chart.datum();
-        console.log({ data });
+        let keyMap = [];
 
         // dimensions
         let width = 0;
         let height = 0;
-        const MARGIN_TOP = 0;
+        const MARGIN_TOP = 16;
         const MARGIN_BOTTOM = 0;
-        const MARGIN_LEFT = 0;
-        const MARGIN_RIGHT = 0;
+        const MARGIN_LEFT = 16;
+        const MARGIN_RIGHT = 16;
         // height of white keys
         let whiteHeight = 0;
         // width of white keys
         let whiteWidth = 0;
+
+        // animation constants
+        const DURATION = 500;
+        const DELAY = 50;
+
+        // sequences that have already played
+        const finishedSeq = [];
 
         // scales
         const scaleXGuide = d3.scaleBand();
@@ -65,7 +73,6 @@ d3.selection.prototype.noteChart = function init(options) {
 
             whiteHeight = PIANO_HEIGHT;
             const blackHeight = PIANO_HEIGHT * HEIGHT_RATIO;
-            console.log({ width, whiteHeight, blackHeight });
 
             // how many white keys came before this key?
             const numLowerWhites = midi =>
@@ -109,6 +116,83 @@ d3.selection.prototype.noteChart = function init(options) {
             return updatedSeq;
         }
 
+        function setupNoteGroup(sequence, index) {
+            // add location data to played notes
+            const seqLoc = sequence.map(d => ({
+                midi: +d[0],
+                duration: +d[1],
+                coord: keyMap.get(+d[0]),
+            }));
+
+            // setup a group for each played sequence
+            const $gNotes = $vis
+                .select('.g-notes')
+                .append('g')
+                .attr('class', 'sequence')
+                .attr('data-order', index);
+
+            // add played notes to group
+            const $notes = $gNotes
+                .selectAll('.note')
+                .data(seqLoc)
+                .join(enter =>
+                    enter
+                        .append('rect')
+                        .attr('class', 'note')
+                        .attr('data-order', (d, i) => i)
+                )
+                .attr('x', width)
+                .attr('y', d => d.coord.y.min)
+                .attr('width', d => scaleGuideBlock(1 / d.duration))
+                .attr('height', d => d.coord.y.max - d.coord.y.min);
+
+            // for each note, play it
+            $notes.each(playNote);
+        }
+
+        function playNote() {
+            // select the note
+            const note = d3.select(this);
+            const index = note.attr('data-order');
+
+            // animate it
+            note
+                .transition()
+                .duration(DURATION)
+                .delay(DELAY * index)
+                .attr('x', scaleXGuide(index));
+        }
+
+        function moveNoteGroup(index) {
+            const $sequences = $gSeq.selectAll('.sequence');
+            const group = $sequences.filter(
+                (d, i, n) => d3.select(n[i]).attr('data-order') === index
+            );
+
+            const notes = $sequences.selectAll('.note');
+
+            finishedSeq.push(index);
+
+            notes
+                .transition()
+                .duration(DURATION)
+                .attr('y', height * 0.5);
+
+            $sequences.attr('data-status', 'finished');
+
+            const $finished = $gSeq.selectAll('[data-status="finished"]').nodes();
+            console.log({ $finished });
+            $finished.forEach((g, index) => {
+                const test = d3.select(g);
+                console.log({ test, g });
+                const slot = $finished.length - index;
+                test
+                    .transition()
+                    .duration(DURATION)
+                    .attr('transform', `translate(0, ${whiteHeight * slot})`);
+            });
+        }
+
         const Chart = {
             // called once at start
             init() {
@@ -122,6 +206,9 @@ d3.selection.prototype.noteChart = function init(options) {
 
                 // setup group for guide
                 $vis.append('g').attr('class', 'g-guide');
+
+                // setup group for notes
+                $gSeq = $vis.append('g').attr('class', 'g-notes');
             },
             // on resize, update new dimensions
             resize() {
@@ -144,6 +231,10 @@ d3.selection.prototype.noteChart = function init(options) {
 
                 // find which keys are used in current sequence
                 const activeKeys = findUnique(data.sequence.map(d => d.midi));
+
+                // create a key map
+                const keyCoord = guideData.map(d => [d.midi, d.coord]);
+                keyMap = new Map(keyCoord);
 
                 // append the piano
                 $vis
@@ -170,7 +261,9 @@ d3.selection.prototype.noteChart = function init(options) {
                 // setup scales for sequence guides
                 const durations = guideData.map(d => d.duration);
                 const uniqueDurations = findUnique(durations);
-                scaleXGuide.range([0, width / 2]).domain(d3.range(0, guideData.length));
+                scaleXGuide
+                    .range([0, width * 0.75])
+                    .domain(d3.range(0, guideData.length));
                 scaleGuideBlock
                     .range([whiteWidth, whiteWidth * 2])
                     .domain([
@@ -188,6 +281,39 @@ d3.selection.prototype.noteChart = function init(options) {
                     .attr('y', d => d.coord.y.min)
                     .attr('width', d => scaleGuideBlock(1 / d.duration))
                     .attr('height', d => d.coord.y.max - d.coord.y.min);
+
+                // if results have already been generated
+                if (data.result) {
+                    const results = data.result.recent;
+                    let seqPromise = Promise.resolve();
+                    const interval = DURATION + DELAY * results.length;
+
+                    const filteredResults = results.filter(d => d.length > 1);
+
+                    filteredResults.forEach((d, i) => {
+                        seqPromise = seqPromise
+                            .then(() => {
+                                setupNoteGroup(d, i);
+                                return new Promise(resolve => {
+                                    setTimeout(resolve, interval);
+                                });
+                            })
+                            .then(() => {
+                                moveNoteGroup(i);
+
+                                return new Promise(resolve => {
+                                    setTimeout(resolve, interval);
+                                });
+                            });
+                    });
+
+                    seqPromise.then(() => {
+                        console.log('loop finished');
+                    });
+                    // filteredResults.forEach((d, i) => {
+                    //     setupNoteGroup(d)
+                    // });
+                }
 
                 return Chart;
             },

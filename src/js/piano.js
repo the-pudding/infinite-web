@@ -15,8 +15,6 @@ function setupCharts() {
     const condition = $sel.attr('data-type');
     let specificData = [];
 
-    console.log({ check: data });
-
     // separate out phases for the first few steps which repeat the same piano
     const setupPianos = ['two', 'animated', 'results', 'success'];
     if (setupPianos.includes(condition))
@@ -24,8 +22,6 @@ function setupCharts() {
     else if (condition === 'Meryl')
         specificData = data.levels.filter(d => d.title === 'Symphony No. 5  II')[0];
     else specificData = data.levels.filter(d => d.title === 'Louie Louie')[0];
-
-    console.log({ specificData });
 
     const chart = $sel.data([specificData]).noteChart();
     chart.resize().render();
@@ -48,8 +44,6 @@ function findKeys(range) {
     );
 
     const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
-
-    console.log({ range, endMidis, allMidis, uniqueOctaves, allOctaves, keys });
 
     return keys;
 }
@@ -74,14 +68,10 @@ function cleanData(dat) {
         keys: findKeys(d.range.midis),
     }));
 
-    console.log({ cleanedLevels, dat });
-
     const cleaned = [dat].map(d => ({
         ...d,
         levels: cleanedLevels,
     }))[0];
-
-    console.log({ cleaned });
 
     return cleaned;
 }
@@ -92,7 +82,6 @@ function init() {
 
     loadData([dataURL, './crosswalk.csv'])
         .then(result => {
-            console.log({ result });
             crosswalk = cleanCrosswalk(result[1]);
             return result[0];
         })
