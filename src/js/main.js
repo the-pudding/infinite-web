@@ -4,6 +4,7 @@ import isMobile from './utils/is-mobile';
 import linkFix from './utils/link-fix';
 import graphic from './graphic';
 import piano from './piano';
+import probability from './probability';
 import footer from './footer';
 
 const $body = d3.select('body');
@@ -16,6 +17,7 @@ function resize() {
   if (previousWidth !== width) {
     previousWidth = width;
     graphic.resize();
+    probability.resize();
     // piano.resize();
   }
 }
@@ -45,6 +47,7 @@ function init() {
   // kick off graphic code
   graphic.init();
   // piano.init();
+  probability.init();
   // load footer stories
   footer.init();
 }
