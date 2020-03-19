@@ -1,12 +1,12 @@
 .intro
 	margin 0 auto
-	padding 6rem 1rem 3rem 1rem
+	padding 6rem 1rem 12rem 1rem
 	max-width $column-width
 	text-align center
 
 	&__byline
-		border 1px solid $gray-light
-		background-color $off-white
+		border 1px solid darken($highlight, 50)
+		background-color $highlight
 		set-type-size(small)
 		display inline-block
 		margin 0 auto
@@ -15,12 +15,22 @@
 	&__overline
 		set-type-size(small)
 		margin-bottom 0
+		line-height 1
 
 	&__prompt
+		display flex
+		flex-direction column
+		align-items center
 		margin 0
+		line-height 1
 
-	span
-		display none
+		button
+			margin-top 0.5rem
 
-	.visible
-		display inline
+		button:first-of-type
+			font-size 1.2em
+
+		button:last-of-type
+			background-color $off-white
+			color $off-black
+			font-size 0.8em
