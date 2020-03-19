@@ -1,0 +1,11 @@
+<article id="story">
+    {{#each doc.content}}
+    {{#if text}}
+    <p>{{{text}}}</p>
+    {{/if}}
+    {{#if graphic}}
+    <div class='{{{graphic}}}__container' data-type={{{type}}}>
+    </div>
+    {{/if}}
+    {{/each}}
+</article>
