@@ -1,28 +1,26 @@
 .intro
-	display none
 	margin 0 auto
 	padding 6rem 1rem 3rem 1rem
-
-	&__hed
-		margin 0 auto
-		max-width 60rem
-		text-align center
-
-	&__dek
-		margin 0 auto
-		margin-top 1rem
-		max-width $column-width
-		text-align center
+	max-width $column-width
+	text-align center
 
 	&__byline
+		border 1px solid $gray-light
+		background-color $off-white
+		set-type-size(small)
+		display inline-block
 		margin 0 auto
-		margin-top 1rem
-		max-width $column-width
-		text-align center
+		padding 0.5rem
 
-	&__time
-		display block
-		margin 0 auto
-		margin-top 1rem
-		max-width $column-width
-		text-align center
+	&__overline
+		set-type-size(small)
+		margin-bottom 0
+
+	&__prompt
+		margin 0
+
+	span
+		display none
+
+	.visible
+		display inline

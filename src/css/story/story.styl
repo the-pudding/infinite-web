@@ -1,24 +1,29 @@
 /* CUSTOM STORY STYLE */
-#temp
-	padding 5rem 1rem
-	font-family $mono
+body
+	font-family $sans
 
-	table
-		th
-			font-weight bold
+article
+	margin 3rem auto 0 auto
+	padding 0 1rem
+	max-width $column-width
 
-		td, th
-			padding 0.75em
-			set-type-size(small)
+	p
+		margin 1rem auto
 
-		tr
-			border-bottom 1px solid $fg
+		+mq('bp-4')
+			set-type-size(x-large, false)
+			line-height 1.5
 
-		td, th
-			text-align right
+button
+	padding 1rem
+	border 1px solid $gray-light
+	background-color $off-black
+	color $white
+	text-transform uppercase
+	font-weight bold
+	font-family $sans
+	line-height 1
 
-			&:nth-of-type(1)
-				text-align left
-article 
-	max-width $column-width 
-	margin 5rem auto 0 auto
+	svg
+		width 1rem
+		height 1rem

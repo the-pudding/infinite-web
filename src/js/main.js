@@ -16,7 +16,7 @@ function resize() {
   if (previousWidth !== width) {
     previousWidth = width;
     graphic.resize();
-    piano.resize();
+    // piano.resize();
   }
 }
 
@@ -44,7 +44,7 @@ function init() {
   setupStickyHeader();
   // kick off graphic code
   graphic.init();
-  piano.init();
+  // piano.init();
   // load footer stories
   footer.init();
 }
