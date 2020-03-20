@@ -5,8 +5,6 @@ const choices = {
 };
 const len = 4;
 
-function resize() {}
-
 function setupChart() {
   const $chart = d3.select(this);
   const t = $chart.attr('data-type');
@@ -21,8 +19,8 @@ function setupChart() {
     .html(
       (d, i) =>
         `<strong>${i + 1}${
-          i === 0 ? ' note' : ''
-        }</strong><span>1 in ${d}</span>`
+          i === 0 ? ' note' : ' notes'
+        }</strong><span><mark>1 in ${d}</mark></span>`
     );
   $div
     .append('ul')
@@ -35,4 +33,4 @@ function init() {
   d3.selectAll('.probability__container').each(setupChart);
 }
 
-export default { init, resize };
+export default { init };

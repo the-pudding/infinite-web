@@ -1,6 +1,11 @@
 /* CUSTOM STORY STYLE */
 body
+	background-color $bg
 	font-family $sans
+
+mark
+	padding 0.25em 0.5em
+	background-color $highlight
 
 article
 	margin 0 auto
@@ -8,17 +13,16 @@ article
 	max-width $column-width
 
 	p
-		margin 1rem auto
+		margin 1.5em auto
 
 		+mq('bp-4')
 			set-type-size(x-large, false)
 			line-height 1.5
 
 .btn
-	padding 1em
-	border 1px solid $gray-light
-	background-color $off-black
-	color $white
+	padding 0.75em
+	background-color $fg
+	color $bg
 	font-weight bold
 	font-size 1em
 	font-family $sans
@@ -29,5 +33,13 @@ article
 		height 1em
 		vertical-align top
 
-iframe, video, .odds__container, .probability__container
+iframe, video, .odds__container, .probability__container, .clock__container, .shakespeare__container
 	margin 2rem auto
+	padding 1rem
+	background-color $off-white
+	font-family $mono
+
+.instruction
+	margin 0
+	text-align center
+	font-size 0.75em
