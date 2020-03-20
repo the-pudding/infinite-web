@@ -17,6 +17,7 @@ d3.selection.prototype.noteChart = function init(options) {
     let $gSeq = null;
     const $axis = null;
     let $vis = null;
+    const thisChart = $chart.attr('data-type');
 
     // data
     let data = $chart.datum();
@@ -72,7 +73,6 @@ d3.selection.prototype.noteChart = function init(options) {
       DELAY = correctSeq.map(d =>
         Math.floor(BEAT_LENGTH * (4 / 2 ** d.duration))
       );
-      // console.log({ DELAY });
       DURATION = d3.sum(DELAY);
     }
 
@@ -87,9 +87,9 @@ d3.selection.prototype.noteChart = function init(options) {
       const PIANO_HEIGHT = tooTall
         ? // if so, figure out the widest each key can be
         height / numKeys / WIDTH_TO_HEIGHT_RATIO
-        : // otherwise, scale the piano's height based on taking up 1/4 of the svg width
+        : //   otherwise  , scale the piano's height based on taking up 1/4 of the svg width
         width * 0.25;
-      // const PIANO_WIDTH = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO;
+      // const PIANO_WIDTH = PIANO_HEIGHT *   WIDTH_TO_HEIGHT_RATIO;
       const WIDTH_RATIO = 0.7;
       const HEIGHT_RATIO = 0.6;
       whiteWidth = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO; // Math.round(PIANO_WIDTH / whiteKeys);
@@ -153,7 +153,7 @@ d3.selection.prototype.noteChart = function init(options) {
       const index = note.attr('data-order');
       const thisDelay = d3.sum(DELAY.slice(0, index));
       const { midi } = note.data()[0];
-      d3.selectAll('[data-chart="bar"]');
+
       const key = $vis.selectAll(`[data-midi='${midi}']`);
       key
         .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
@@ -165,7 +165,6 @@ d3.selection.prototype.noteChart = function init(options) {
         .duration(0)
         .delay(DELAY[index])
         .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
-      console.log({ DURATION, thisDelay, check: DELAY[index] });
 
       // animate it
       note
@@ -323,19 +322,21 @@ d3.selection.prototype.noteChart = function init(options) {
           ]);
 
         // append the sequence guides
-        $vis
-          .select('.g-guide')
-          .selectAll('.guide')
-          .data(guideData)
-          .join(enter => enter.append('rect').attr('class', 'guide'))
-          .attr('x', (d, i) => scaleXGuide(i))
-          .attr('y', d => d.coord.y.min)
-          .attr('width', d => scaleGuideBlock(1 / d.duration))
-          .attr('height', d => whiteWidth)
-          .style('stroke', d => scaleColor(d.midi));
+        if (thisChart !== 'two') {
+          $vis
+            .select('.g-guide')
+            .selectAll('.guide')
+            .data(guideData)
+            .join(enter => enter.append('rect').attr('class', 'guide'))
+            .attr('x', (d, i) => scaleXGuide(i))
+            .attr('y', d => d.coord.y.min)
+            .attr('width', d => scaleGuideBlock(1 / d.duration))
+            .attr('height', d => whiteWidth)
+            .style('stroke', d => scaleColor(d.midi));
+        }
 
         // if results have already been generated
-        if (data.result) {
+        if (data.result && thisChart !== 'two') {
           const results = data.result.recent;
           let seqPromise = Promise.resolve();
           const interval = DURATION * 2;
@@ -359,13 +360,43 @@ d3.selection.prototype.noteChart = function init(options) {
                 });
               });
           });
+        }
 
-          seqPromise.then(() => {
-            // console.log('loop finished');
+        console.log({ thisChart });
+
+        if (thisChart === 'two') {
+          // make keys pressable
+          const keys = $vis.selectAll('.active');
+          keys.on('click', function (d) {
+            const key = d3.select(this);
+            key
+              .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
+              .transition()
+              .duration(0)
+              .delay(0)
+              .style('fill', d => scaleColor(d.midi))
+              .transition()
+              .duration(0)
+              .delay(100)
+              .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+
+            const keyData = key.data();
+            const thisKeyCoord = keyData[0].coord;
+            const thisMidi = keyData[0].midi;
+
+            const note = $gSeq.append('rect').attr('class', 'note');
+
+            note
+              .attr('x', thisKeyCoord.x.min)
+              .attr('y', thisKeyCoord.y.min)
+              .attr('width', scaleGuideBlock(1 / 3))
+              .attr('height', whiteWidth)
+              .style('fill', scaleColor(thisMidi))
+              .transition()
+              .duration(1000)
+              .attr('x', -width);
           });
-          // filteredResults.forEach((d, i) => {
-          //     setupNoteGroup(d)
-          // });
+          console.log({ keys });
         }
 
         return Chart;
