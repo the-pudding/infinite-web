@@ -30,7 +30,7 @@ function setupChart() {
 }
 
 function init() {
-  d3.selectAll('.probability__container').each(setupChart);
+  d3.selectAll('.figure__probability').each(setupChart);
 }
 
 export default { init };

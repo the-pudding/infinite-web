@@ -19,7 +19,7 @@ function resize() {
   if (previousWidth !== width) {
     previousWidth = width;
     graphic.resize();
-    // piano.resize();
+    piano.resize();
   }
 }
 
@@ -38,7 +38,7 @@ function setupStickyHeader() {
 
 function begin(data) {
   graphic.init();
-  // piano.init();
+  piano.init();
   probability.init();
   clock.init(data);
   // load footer stories

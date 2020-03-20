@@ -1,22 +1,29 @@
-.piano__container 
-    height 75vh
-    .key
-        stroke $off-black 
-        stroke-width 1px
-        &__white 
-            fill rgba($gray-light, 0.5) 
-            &.active
-                fill rgba($white, 1)
-        &__black 
-            fill rgba($gray, 0.5)
-            &.active 
-                fill rgba($off-black, 1)
-    .guide 
-        stroke-width 1px
-        stroke-dasharray 4
-        fill none
+.figure__piano
+	height 75vh
 
-    .note 
-        opacity 0.2
-        &.is-correct 
-            opacity 1
+	.key
+		stroke $off-black
+		stroke-width 1px
+
+		&__white
+			fill rgba($gray-light, 0.5)
+
+			&.active
+				fill rgba($white, 1)
+
+		&__black
+			fill rgba($gray, 0.5)
+
+			&.active
+				fill rgba($off-black, 1)
+
+	.guide
+		stroke-width 1px
+		stroke-dasharray 4
+		fill none
+
+	.note
+		opacity 0.2
+
+		&.is-correct
+			opacity 1

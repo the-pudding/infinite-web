@@ -2,8 +2,8 @@ import loadData from './load-data';
 import findUnique from './utils/unique';
 import './pudding-chart/notes';
 
-const $section = d3.select('#story');
-const $pianos = $section.selectAll('.piano__container');
+const $article = d3.select('article');
+const $pianos = $article.selectAll('.figure__piano');
 const charts = [];
 
 let data = [];
