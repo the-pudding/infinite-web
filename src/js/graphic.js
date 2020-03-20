@@ -1,39 +1,32 @@
 /* global d3 */
-import loadData from './load-data';
+import jump from 'jump.js';
+
+const $intro = d3.select('#intro');
+const $header = d3.select('header');
 
 function resize() {}
 
-function handleDataLoad(data) {
-  console.log(data);
-  d3.select('.start span').text(data.start);
-  d3.select('.updated span').text(data.updated);
-  const enter = e => {
-    const tr = e.append('tr');
-    tr.append('td').text(d => d.title);
-    tr.append('td').text(d => d3.format(',')(d.odds));
-    tr.append('td').text(d => d.est);
-    tr.append('td').text(d => d3.format(',')(d.apm));
-    tr.append('td').text(d =>
-      d.result ? d3.format(',')(d.result.attempts) : 'NA'
-    );
-    tr.append('td').text(d =>
-      d.result && d.result.done ? d.result.end : 'NA'
-    );
-    return tr;
-  };
+function toggleAudio(dir) {
+  const isOn = $header.select('.audio .on').classed('is-visible');
+  const goOn = dir ? dir === 'on' : !isOn;
+  const over = goOn ? 'on. Good choice.' : 'off.';
+  $intro.select('.intro__overline span').text(over);
+  $header.select('.on').classed('is-visible', goOn);
+  $header.select('.off').classed('is-visible', !goOn);
+}
+function handleHeader() {
+  toggleAudio();
+}
 
-  d3.select('table tbody')
-    .selectAll('tr')
-    .data(data.levels)
-    .join(enter);
+function handleIntro() {
+  const audio = d3.select(this).attr('data-audio');
+  toggleAudio(audio);
+  jump('article', { duration: 500 });
 }
 
 function init() {
-  const v = Date.now();
-  const dataURL = `https://pudding.cool/2020/04/infinite-data/data.json?version=${v}`;
-  loadData(dataURL)
-    .then(handleDataLoad)
-    .catch(console.log);
+  $intro.selectAll('button').on('click', handleIntro);
+  d3.select('.audio').on('click', handleHeader);
 }
 
 export default { init, resize };

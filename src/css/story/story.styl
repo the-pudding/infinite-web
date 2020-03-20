@@ -1,24 +1,45 @@
 /* CUSTOM STORY STYLE */
-#temp
-	padding 5rem 1rem
+body
+	background-color $bg
+	font-family $sans
+
+mark
+	padding 0.25em 0.5em
+	background-color $highlight
+
+article
+	margin 0 auto
+	padding 6rem 1rem 0 1rem
+	max-width $column-width
+
+	p
+		margin 1.5em auto
+
+		+mq('bp-4')
+			set-type-size(x-large, false)
+			line-height 1.5
+
+.btn
+	padding 0.75em
+	background-color $fg
+	color $bg
+	font-weight bold
+	font-size 1em
+	font-family $sans
+	line-height 1
+
+	svg
+		width 1em
+		height 1em
+		vertical-align top
+
+iframe, video, .odds__container, .probability__container, .clock__container, .shakespeare__container
+	margin 2rem auto
+	padding 1rem
+	background-color $off-white
 	font-family $mono
 
-	table
-		th
-			font-weight bold
-
-		td, th
-			padding 0.75em
-			set-type-size(small)
-
-		tr
-			border-bottom 1px solid $fg
-
-		td, th
-			text-align right
-
-			&:nth-of-type(1)
-				text-align left
-article 
-	max-width $column-width 
-	margin 5rem auto 0 auto
+.instruction
+	margin 0
+	text-align center
+	font-size 0.75em

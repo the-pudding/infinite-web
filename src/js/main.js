@@ -4,7 +4,10 @@ import isMobile from './utils/is-mobile';
 import linkFix from './utils/link-fix';
 import graphic from './graphic';
 import piano from './piano';
+import probability from './probability';
+import clock from './clock';
 import footer from './footer';
+import loadData from './load-data';
 
 const $body = d3.select('body');
 let previousWidth = 0;
@@ -16,7 +19,7 @@ function resize() {
   if (previousWidth !== width) {
     previousWidth = width;
     graphic.resize();
-    piano.resize();
+    // piano.resize();
   }
 }
 
@@ -33,6 +36,14 @@ function setupStickyHeader() {
   }
 }
 
+function begin(data) {
+  graphic.init();
+  // piano.init();
+  probability.init();
+  clock.init(data);
+  // load footer stories
+  footer.init();
+}
 function init() {
   // adds rel="noopener" to all target="_blank" links
   linkFix();
@@ -43,10 +54,12 @@ function init() {
   // setup sticky header menu
   setupStickyHeader();
   // kick off graphic code
-  graphic.init();
-  piano.init();
-  // load footer stories
-  footer.init();
+
+  const v = Date.now();
+  const dataURL = `https://pudding.cool/2020/04/infinite-data/data.json?version=${v}`;
+  loadData(dataURL)
+    .then(begin)
+    .catch(console.log);
 }
 
 init();

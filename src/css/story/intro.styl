@@ -1,28 +1,35 @@
 .intro
-	display none
 	margin 0 auto
-	padding 6rem 1rem 3rem 1rem
-
-	&__hed
-		margin 0 auto
-		max-width 60rem
-		text-align center
-
-	&__dek
-		margin 0 auto
-		margin-top 1rem
-		max-width $column-width
-		text-align center
+	padding 6rem 1rem 12rem 1rem
+	max-width $column-width
+	text-align center
 
 	&__byline
+		background-color $highlight
+		set-type-size(small)
+		display inline-block
 		margin 0 auto
-		margin-top 1rem
-		max-width $column-width
-		text-align center
+		padding 0.5rem
 
-	&__time
-		display block
-		margin 0 auto
-		margin-top 1rem
-		max-width $column-width
-		text-align center
+	&__overline
+		set-type-size(small)
+		margin-bottom 0
+		line-height 1
+
+	&__prompt
+		display flex
+		flex-direction column
+		align-items center
+		margin 0
+		line-height 1
+
+		button
+			margin-top 0.5rem
+
+		button:first-of-type
+			font-size 1.25em
+
+		button:last-of-type
+			background-color $gray-light
+			color $off-black
+			font-size 0.75em

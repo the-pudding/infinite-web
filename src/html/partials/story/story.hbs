@@ -1,11 +1,28 @@
 <article id="story">
-    {{#each doc.content}}
-    {{#if text}}
-    <p>{{{text}}}</p>
-    {{/if}}
-    {{#if graphic}}
-    <div class='{{{graphic}}}__container' data-type={{{type}}}>
-    </div>
-    {{/if}}
-    {{/each}}
+	{{#each doc.content}}
+		{{#if text}}
+			<p>{{{text}}}</p>
+		{{/if}}
+		{{#if graphic}}
+			{{#ifEquals graphic 'odds'}}
+				{{> story/odds }}
+			{{/ifEquals}}
+			{{#ifEquals graphic 'piano'}}
+				<div class='{{{graphic}}}__container' data-type={{{type}}}></div>
+			{{/ifEquals}}
+			{{#ifEquals graphic 'probability'}}
+				<div class='{{{graphic}}}__container' data-type={{{type}}}></div>
+			{{/ifEquals}}
+		{{/if}}
+		{{#if youtube}}
+			{{> story/youtube }}
+		{{/if}}
+		{{#if video}}
+			{{> story/video }}
+		{{/if}}
+		{{#if clock}}
+			{{> story/clock }}
+		{{/if}}
+	{{/each}}
+
 </article>
