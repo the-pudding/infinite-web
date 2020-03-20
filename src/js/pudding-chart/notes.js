@@ -56,7 +56,7 @@ d3.selection.prototype.noteChart = function init(options) {
     const scaleY = null;
     const scaleColor = d3
       .scaleOrdinal()
-      .range(['#FF533D', '#4717F6', '#E5E338', '#A239CA', '#34A29E']);
+      .range(['#ff5470', '#00ebc7', '#fde24f', '#A239CA', '#34A29E']);
 
     // helper functions
 
@@ -86,9 +86,9 @@ d3.selection.prototype.noteChart = function init(options) {
       const tooTall = idealWidth * numKeys > height;
       const PIANO_HEIGHT = tooTall
         ? // if so, figure out the widest each key can be
-          height / numKeys / WIDTH_TO_HEIGHT_RATIO
+        height / numKeys / WIDTH_TO_HEIGHT_RATIO
         : // otherwise, scale the piano's height based on taking up 1/4 of the svg width
-          width * 0.25;
+        width * 0.25;
       // const PIANO_WIDTH = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO;
       const WIDTH_RATIO = 0.7;
       const HEIGHT_RATIO = 0.6;
@@ -147,6 +147,34 @@ d3.selection.prototype.noteChart = function init(options) {
       );
     }
 
+    function playNote() {
+      // select the note
+      const note = d3.select(this);
+      const index = note.attr('data-order');
+      const thisDelay = d3.sum(DELAY.slice(0, index));
+      const { midi } = note.data()[0];
+      d3.selectAll('[data-chart="bar"]');
+      const key = $vis.selectAll(`[data-midi='${midi}']`);
+      key
+        .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
+        .transition()
+        .duration(0)
+        .delay(thisDelay)
+        .style('fill', scaleColor(midi))
+        .transition()
+        .duration(0)
+        .delay(DELAY[index])
+        .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+      console.log({ DURATION, thisDelay, check: DELAY[index] });
+
+      // animate it
+      note
+        .transition()
+        .duration(DURATION)
+        .delay(thisDelay)
+        .attr('x', scaleXGuide(index));
+    }
+
     function setupNoteGroup(sequence, index) {
       // add location data to played notes
       const seqLoc = sequence.map(d => ({
@@ -175,26 +203,12 @@ d3.selection.prototype.noteChart = function init(options) {
         .attr('x', width * 0.9)
         .attr('y', d => d.coord.y.min)
         .attr('width', d => scaleGuideBlock(1 / d.duration))
-        .attr('height', d => d.coord.y.max - d.coord.y.min)
+        .attr('height', d => whiteWidth)
         .style('fill', d => scaleColor(d.midi))
         .classed('is-correct', (d, i) => isCorrect(d, i));
 
       // for each note, play it
       $notes.each(playNote);
-    }
-
-    function playNote() {
-      // select the note
-      const note = d3.select(this);
-      const index = note.attr('data-order');
-      const thisDelay = d3.sum(DELAY.slice(0, index));
-
-      // animate it
-      note
-        .transition()
-        .duration(DURATION)
-        .delay(thisDelay)
-        .attr('x', scaleXGuide(index));
     }
 
     function moveNoteGroup(index) {
@@ -317,7 +331,7 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('x', (d, i) => scaleXGuide(i))
           .attr('y', d => d.coord.y.min)
           .attr('width', d => scaleGuideBlock(1 / d.duration))
-          .attr('height', d => d.coord.y.max - d.coord.y.min)
+          .attr('height', d => whiteWidth)
           .style('stroke', d => scaleColor(d.midi));
 
         // if results have already been generated

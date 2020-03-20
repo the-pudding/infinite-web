@@ -19,7 +19,7 @@
     "babel-eslint": "10.1.0",
     "cli-error-notifier": "2.1.0",
     "d3-dsv": "1.2.0",
-    "eslint": "6.8.0",
+    "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "14.0.0",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-import": "2.20.1",
