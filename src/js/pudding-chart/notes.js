@@ -87,9 +87,9 @@ d3.selection.prototype.noteChart = function init(options) {
       const tooTall = idealWidth * numKeys > height;
       const PIANO_HEIGHT = tooTall
         ? // if so, figure out the widest each key can be
-        height / numKeys / WIDTH_TO_HEIGHT_RATIO
+          height / numKeys / WIDTH_TO_HEIGHT_RATIO
         : //   otherwise  , scale the piano's height based on taking up 1/4 of the svg width
-        width * 0.25;
+          width * 0.25;
       // const PIANO_WIDTH = PIANO_HEIGHT *   WIDTH_TO_HEIGHT_RATIO;
       const WIDTH_RATIO = 0.7;
       const HEIGHT_RATIO = 0.6;
@@ -154,8 +154,7 @@ d3.selection.prototype.noteChart = function init(options) {
       const index = note.attr('data-order');
       const thisDelay = d3.sum(DELAY.slice(0, index));
       const { midi } = note.data()[0];
-      const staticSeq = thisChart === 'results' && +index === 0;
-      console.log({ staticSeq, index });
+      const parentStatic = d3.select(this.parentNode).attr('data-static');
 
       const key = $vis.selectAll(`[data-midi='${midi}']`);
       key
@@ -171,15 +170,15 @@ d3.selection.prototype.noteChart = function init(options) {
 
       // animate it
       note
+        .attr('data-static', parentStatic)
         .transition()
-        .duration(staticSeq ? 0 : DURATION)
-        .delay(thisDelay)
+        .duration(parentStatic === 'true' ? 0 : DURATION)
+        .delay(parentStatic === 'true' ? 0 : thisDelay)
         .attr('x', scaleXGuide(index));
     }
 
     function setupNoteGroup(sequence, index) {
       const staticSeq = thisChart === 'results' && +index === 0;
-      console.log({ staticSeq, index });
       // add location data to played notes
       const seqLoc = sequence.map(d => ({
         midi: +d[0],
@@ -192,7 +191,8 @@ d3.selection.prototype.noteChart = function init(options) {
         .select('.g-notes')
         .append('g')
         .attr('class', 'sequence')
-        .attr('data-order', index);
+        .attr('data-order', index)
+        .attr('data-static', staticSeq);
 
       // add played notes to group
       const $notes = $gNotes
@@ -218,16 +218,18 @@ d3.selection.prototype.noteChart = function init(options) {
     function moveNoteGroup(index) {
       const $sequences = $gSeq.selectAll('.sequence');
       const group = $sequences.filter(
-        (d, i, n) => d3.select(n[i]).attr('data-order') === index
+        (d, i, n) => d3.select(n[i]).attr('data-order') === index.toString()
       );
 
-      const notes = $sequences.selectAll('.note');
+      const groupStatic = group.attr('data-static');
+
+      const notes = group.selectAll('.note');
 
       finishedSeq.push(index);
 
       notes
         .transition()
-        .duration(200)
+        .duration(groupStatic === 'true' ? 0 : 200)
         .attr('y', height * 0.5);
 
       $sequences.attr('data-status', 'finished');
@@ -235,11 +237,12 @@ d3.selection.prototype.noteChart = function init(options) {
       const $finished = $gSeq.selectAll('[data-status="finished"]').nodes();
       $finished.forEach((g, index) => {
         const played = d3.select(g);
+        const staticPlayed = played.attr('data-static');
         const slot = $finished.length - index;
 
         played
           .transition()
-          .duration(200)
+          .duration(staticPlayed === 'true' ? 0 : 200)
           .attr('transform', `translate(0, ${(whiteWidth + PADDING) * slot})`);
       });
     }
@@ -345,11 +348,12 @@ d3.selection.prototype.noteChart = function init(options) {
           const results = data.result.recent;
           let seqPromise = Promise.resolve();
           const interval = DURATION * 2;
-          // console.log({ data, results });
 
           const filteredResults = results.filter(d => d.length > 1);
 
           filteredResults.forEach((d, i) => {
+            const staticSeq = d3.selectAll(`[data-order='${i}']`);
+            console.log({ staticSeq, i });
             seqPromise = seqPromise
               .then(() => {
                 setupNoteGroup(d, i);
@@ -367,12 +371,10 @@ d3.selection.prototype.noteChart = function init(options) {
           });
         }
 
-        console.log({ thisChart });
-
         if (thisChart === 'two') {
-          // make keys pessable
+          // make keys pressable
           const keys = $vis.selectAll('.active');
-          keys.on('click', function (d) {
+          keys.on('click', function() {
             const key = d3.select(this);
             key
               .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
@@ -401,7 +403,6 @@ d3.selection.prototype.noteChart = function init(options) {
               .duration(1000)
               .attr('x', -width);
           });
-          console.log({ keys });
         }
 
         return Chart;
