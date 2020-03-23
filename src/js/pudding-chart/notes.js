@@ -353,7 +353,6 @@ d3.selection.prototype.noteChart = function init(options) {
 
           filteredResults.forEach((d, i) => {
             const staticSeq = d3.selectAll(`[data-order='${i}']`);
-            console.log({ staticSeq, i });
             seqPromise = seqPromise
               .then(() => {
                 setupNoteGroup(d, i);

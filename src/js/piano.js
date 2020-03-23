@@ -1,6 +1,8 @@
 import loadData from './load-data';
 import findUnique from './utils/unique';
+import audio from './audio';
 import './pudding-chart/notes';
+import dirtyCrosswalk from './pianoData.json';
 
 const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
@@ -22,12 +24,10 @@ function setupCharts() {
       d => d.title === 'Symphony No. 5 I'
     )[0];
     if (condition === 'animated') {
-      // console.log({ filteredData });
       specificData = [filteredData].map(d => {
         return {
           ...d,
           result: [d.result].map(e => {
-            // console.log({ e });
             return {
               ...e,
               recent: [e.recent[0]],
@@ -36,10 +36,14 @@ function setupCharts() {
         };
       })[0];
     } else specificData = filteredData;
-    // console.log({ specificData });
   } else if (condition === 'Meryl')
     specificData = data.levels.filter(d => d.title === 'Symphony No. 5  II')[0];
   else specificData = data.levels.filter(d => d.title === 'Ice Ice Baby')[0];
+
+  const seq = specificData.sequence;
+  const { tempo } = specificData;
+  const { sig } = specificData;
+  audio(seq, tempo, sig);
 
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
@@ -98,14 +102,13 @@ function init() {
   const v = Date.now();
   const dataURL = `https://pudding.cool/2020/04/infinite-data/data.json?version=${v}`;
 
-  loadData([dataURL, './crosswalk.csv'])
+  loadData(dataURL)
     .then(result => {
-      crosswalk = cleanCrosswalk(result[1]);
-      return result[0];
+      crosswalk = cleanCrosswalk(dirtyCrosswalk);
+      return result;
     })
     .then(result => {
       data = cleanData(result);
-      // console.log({ data });
       $pianos.each(setupCharts);
     })
     .catch(console.log);
