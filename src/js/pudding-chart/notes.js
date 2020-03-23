@@ -73,6 +73,7 @@ d3.selection.prototype.noteChart = function init(options) {
       DELAY = correctSeq.map(d =>
         Math.floor(BEAT_LENGTH * (4 / 2 ** d.duration))
       );
+
       DURATION = d3.sum(DELAY);
     }
 
@@ -153,6 +154,8 @@ d3.selection.prototype.noteChart = function init(options) {
       const index = note.attr('data-order');
       const thisDelay = d3.sum(DELAY.slice(0, index));
       const { midi } = note.data()[0];
+      const staticSeq = thisChart === 'results' && +index === 0;
+      console.log({ staticSeq, index });
 
       const key = $vis.selectAll(`[data-midi='${midi}']`);
       key
@@ -169,12 +172,14 @@ d3.selection.prototype.noteChart = function init(options) {
       // animate it
       note
         .transition()
-        .duration(DURATION)
+        .duration(staticSeq ? 0 : DURATION)
         .delay(thisDelay)
         .attr('x', scaleXGuide(index));
     }
 
     function setupNoteGroup(sequence, index) {
+      const staticSeq = thisChart === 'results' && +index === 0;
+      console.log({ staticSeq, index });
       // add location data to played notes
       const seqLoc = sequence.map(d => ({
         midi: +d[0],
@@ -365,7 +370,7 @@ d3.selection.prototype.noteChart = function init(options) {
         console.log({ thisChart });
 
         if (thisChart === 'two') {
-          // make keys pressable
+          // make keys pessable
           const keys = $vis.selectAll('.active');
           keys.on('click', function (d) {
             const key = d3.select(this);
