@@ -1,3 +1,4 @@
+import EnterView from 'enter-view';
 import loadData from './load-data';
 import findUnique from './utils/unique';
 import audio from './audio';
@@ -11,6 +12,26 @@ const charts = [];
 let data = [];
 let crosswalk = [];
 let cwMap = [];
+
+function setupChartEnter() {
+  EnterView({
+    selector: '.figure__piano',
+    enter(el, i) {
+      console.log({ el });
+      // pause other charts
+      Object.keys(charts).map(d => {
+        const val = charts[d];
+        console.log({ val });
+        val.pause();
+      });
+      // const fil = d3.select(el).attr('data-filter');
+      // const rend = charts[fil];
+      // rend.render();
+    },
+    offset: 0.25,
+    once: true,
+  });
+}
 
 function setupCharts() {
   const $sel = d3.select(this);
@@ -110,6 +131,9 @@ function init() {
     .then(result => {
       data = cleanData(result);
       $pianos.each(setupCharts);
+    })
+    .then(() => {
+      setupChartEnter();
     })
     .catch(console.log);
 }

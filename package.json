@@ -8,6 +8,7 @@
     "node": "10.18.0"
   },
   "dependencies": {
+    "enter-view": "^2.0.0",
     "jump.js": "^1.0.2",
     "lodash.debounce": "4.0.8",
     "nouislider": "14.1.1",

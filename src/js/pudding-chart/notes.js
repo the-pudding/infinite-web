@@ -407,6 +407,10 @@ d3.selection.prototype.noteChart = function init(options) {
           });
         }
       },
+      // pause animations?
+      pause() {
+        console.log('paused');
+      },
       // get / set data
       data(val) {
         if (!arguments.length) return data;
