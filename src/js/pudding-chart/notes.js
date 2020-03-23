@@ -343,33 +343,6 @@ d3.selection.prototype.noteChart = function init(options) {
             .style('stroke', d => scaleColor(d.midi));
         }
 
-        // if results have already been generated
-        if (data.result && thisChart !== 'two') {
-          const results = data.result.recent;
-          let seqPromise = Promise.resolve();
-          const interval = DURATION * 2;
-
-          const filteredResults = results.filter(d => d.length > 1);
-
-          filteredResults.forEach((d, i) => {
-            const staticSeq = d3.selectAll(`[data-order='${i}']`);
-            seqPromise = seqPromise
-              .then(() => {
-                setupNoteGroup(d, i);
-                return new Promise(resolve => {
-                  setTimeout(resolve, interval);
-                });
-              })
-              .then(() => {
-                moveNoteGroup(i);
-
-                return new Promise(resolve => {
-                  setTimeout(resolve, interval);
-                });
-              });
-          });
-        }
-
         if (thisChart === 'two') {
           // make keys pressable
           const keys = $vis.selectAll('.active');
@@ -405,6 +378,34 @@ d3.selection.prototype.noteChart = function init(options) {
         }
 
         return Chart;
+      },
+      update() {
+        // if results have already been generated
+        if (data.result && thisChart !== 'two') {
+          const results = data.result.recent;
+          let seqPromise = Promise.resolve();
+          const interval = DURATION * 2;
+
+          const filteredResults = results.filter(d => d.length > 1);
+
+          filteredResults.forEach((d, i) => {
+            const staticSeq = d3.selectAll(`[data-order='${i}']`);
+            seqPromise = seqPromise
+              .then(() => {
+                setupNoteGroup(d, i);
+                return new Promise(resolve => {
+                  setTimeout(resolve, interval);
+                });
+              })
+              .then(() => {
+                moveNoteGroup(i);
+
+                return new Promise(resolve => {
+                  setTimeout(resolve, interval);
+                });
+              });
+          });
+        }
       },
       // get / set data
       data(val) {

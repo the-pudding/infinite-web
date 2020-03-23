@@ -3,7 +3,6 @@ import pianoData from './pianoData.json';
 // desired output
 // [{ time: "0:0:0", note: "C4", duration: "4n" }]
 export default function midiToNotation(arr) {
-  console.log('running');
   const a = arr.map(({ midi, duration }) => {
     const match = pianoData.find(p => +p.midi === midi);
     const note = match ? `${match.note}${match.octave}` : null;
