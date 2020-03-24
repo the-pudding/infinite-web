@@ -7,7 +7,7 @@ import dirtyCrosswalk from './pianoData.json';
 
 const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
-const charts = [];
+const charts = {};
 
 let data = [];
 let crosswalk = [];
@@ -17,27 +17,25 @@ function setupChartEnter() {
   EnterView({
     selector: '.figure__piano',
     enter(el, i) {
-      console.log({ el });
       // pause other charts
       Object.keys(charts).map(d => {
         const val = charts[d];
         console.log({ val });
         val.pause();
       });
-      // const fil = d3.select(el).attr('data-filter');
-      // const rend = charts[fil];
-      // rend.render();
+
+      // charts[i].update();
+      const condition = d3.select(el).attr('data-type');
+      const rend = charts[condition];
+      rend.update();
     },
     offset: 0.25,
     once: true,
   });
 }
 
-function setupCharts() {
-  const $sel = d3.select(this);
-  const condition = $sel.attr('data-type');
-  let specificData = [];
-
+function filterData(condition) {
+  let specificData = null;
   // separate out phases for the first few steps which repeat the same piano
   const setupPianos = ['two', 'animated', 'results', 'success'];
   if (setupPianos.includes(condition)) {
@@ -61,14 +59,17 @@ function setupCharts() {
     specificData = data.levels.filter(d => d.title === 'Symphony No. 5  II')[0];
   else specificData = data.levels.filter(d => d.title === 'Ice Ice Baby')[0];
 
-  const seq = specificData.sequence;
-  const { tempo } = specificData;
-  const { sig } = specificData;
-  audio(seq, tempo, sig);
+  return specificData;
+}
+
+function setupCharts() {
+  const $sel = d3.select(this);
+  const condition = $sel.attr('data-type');
+  const specificData = filterData(condition);
 
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
-  charts.push(chart);
+  charts[condition] = chart;
 }
 
 function findKeys(range) {
