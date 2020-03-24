@@ -4,6 +4,7 @@ import isMobile from './utils/is-mobile';
 import linkFix from './utils/link-fix';
 import graphic from './graphic';
 import piano from './piano';
+import audio from './audio';
 import probability from './probability';
 import clock from './clock';
 import footer from './footer';
@@ -39,6 +40,7 @@ function setupStickyHeader() {
 function begin(data) {
   graphic.init();
   piano.init();
+  audio();
   probability.init();
   clock.init(data);
   // load footer stories

@@ -13,26 +13,25 @@ let data = [];
 let crosswalk = [];
 let cwMap = [];
 
-function setupChartEnter() {
-  EnterView({
-    selector: '.figure__piano',
-    enter(el, i) {
-      // pause other charts
-      Object.keys(charts).map(d => {
-        const val = charts[d];
-        console.log({ val });
-        val.pause();
-      });
+// function setupChartEnter() {
+//   EnterView({
+//     selector: '.figure__piano',
+//     enter(el, i) {
+//       // pause other charts
+//       Object.keys(charts).map(d => {
+//         const val = charts[d];
+//         val.pause();
+//       });
 
-      // charts[i].update();
-      const condition = d3.select(el).attr('data-type');
-      const rend = charts[condition];
-      rend.update();
-    },
-    offset: 0.25,
-    once: true,
-  });
-}
+//       // select the currently entered chart and update/play it
+//       const condition = d3.select(el).attr('data-type');
+//       const rend = charts[condition];
+//       rend.update();
+//     },
+//     offset: 0.25,
+//     once: true,
+//   });
+// }
 
 function filterData(condition) {
   let specificData = null;
@@ -70,6 +69,12 @@ function setupCharts() {
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
   charts[condition] = chart;
+}
+
+function importCharts() {
+  return new Promise((resolve, reject) => {
+    resolve({ charts });
+  });
 }
 
 function findKeys(range) {
@@ -133,9 +138,6 @@ function init() {
       data = cleanData(result);
       $pianos.each(setupCharts);
     })
-    .then(() => {
-      setupChartEnter();
-    })
     .catch(console.log);
 }
 
@@ -143,4 +145,4 @@ function resize() {
   charts.forEach(chart => chart.resize().render());
 }
 
-export default { init, resize };
+export default { init, resize, importCharts };

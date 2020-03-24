@@ -379,6 +379,9 @@ d3.selection.prototype.noteChart = function init(options) {
 
         return Chart;
       },
+      play(sequence) {
+        console.log({ sequence });
+      },
       update() {
         // if results have already been generated
         if (data.result && thisChart !== 'two') {
