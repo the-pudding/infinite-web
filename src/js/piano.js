@@ -34,12 +34,12 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const sequenceProgress = [];
 
   // chart.update(sequenceProgress, jump: true);
-  const seqIndex = 0;
+  let seqIndex = 0;
 
   // handle start sequence, and moving on to new sequences
   let notesPlayed = 0;
 
-  const playNextSeqence = () => {
+  const playNextSequence = () => {
     sequenceProgress.push([]);
     const sequence = sequences[seqIndex];
     Audio.play({
@@ -48,9 +48,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
       sig,
       noteCallback: val => {
         // this runs for every note played
-        let newSequence = null;
-        if (notesPlayed === 0) newSequence = true;
-        else newSequence = false;
+        console.log({ sequenceProgress, seqIndex, val });
 
         // find the next note that needs to be played
         const note = val[notesPlayed];
@@ -65,7 +63,18 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
         // [{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }]]
 
         // send the new note data to be updated
-        chart.update(sequenceProgress, newSequence, seqIndex);
+        chart.update(sequenceProgress);
+
+        // check if this was the last note of the sequence
+        if (notesPlayed === val.length) {
+          // move onto the next sequence
+          seqIndex += 1;
+          // start back at 0
+          notesPlayed = 0;
+
+          // if we haven't hit the last sequence, do this again
+          if (seqIndex < sequences.length) playNextSequence();
+        }
         // notesPlayed += 1;
         // if (done with sequence) {
         // seqIndex +=1;
@@ -77,7 +86,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
     });
   };
 
-  playNextSeqence();
+  playNextSequence();
 }
 
 function setupEnterView() {
