@@ -143,8 +143,8 @@ d3.selection.prototype.noteChart = function init(options) {
 
     function isCorrect(note, index) {
       return (
-        note.midi === data.sequence[index][0] &&
-        note.duration === data.sequence[index][1]
+        note[0] === data.sequence[index].midi &&
+        note[1] === data.sequence[index].duration
       );
     }
 
@@ -379,12 +379,13 @@ d3.selection.prototype.noteChart = function init(options) {
 
         return Chart;
       },
-      update(sequenceData) {
+      update({ sequenceProgress, jump }) {
+        const ANIMATION_DURATION = jump ? 0 : 50;
         const $group = $vis.select('.g-notes');
 
         const $seq = $group
           .selectAll('.sequence')
-          .data(sequenceData)
+          .data(sequenceProgress)
           .join(enter =>
             enter
               .append('g')
@@ -411,17 +412,20 @@ d3.selection.prototype.noteChart = function init(options) {
 
             $playedNote
               .transition()
-              .duration(50)
+              .duration(ANIMATION_DURATION)
               .attr('x', (d, i) => scaleXGuide(i));
           });
       },
-      moveSequence(seqIndex) {
+      moveSequence({ index, jump }) {
+        const seqIndex = index;
+        const ANIMATION_DURATION = jump ? 0 : 200;
+        const ANIMATION_DELAY = jump ? 0 : 100;
+
         // set the just finished sequence class to finished
         const $justFinished = $vis
           .selectAll('.sequence')
           .filter((d, i, n) => {
             const order = d3.select(n[i]).attr('data-order');
-            console.log({ order, seqIndex });
             return order === `${seqIndex}`;
           })
           .classed('finished', true);
@@ -429,8 +433,8 @@ d3.selection.prototype.noteChart = function init(options) {
         $justFinished
           .selectAll('.note')
           .transition()
-          .delay(100)
-          .duration(300)
+          .delay(ANIMATION_DELAY)
+          .duration(ANIMATION_DURATION)
           .attr('y', height * 0.5);
 
         const $allFinished = $vis.selectAll('.finished').nodes();
@@ -441,14 +445,12 @@ d3.selection.prototype.noteChart = function init(options) {
 
           played
             .transition()
-            .duration(200)
+            .duration(ANIMATION_DURATION)
             .attr(
               'transform',
               `translate(0, ${(whiteWidth + PADDING) * slot})`
             );
         });
-
-        console.log({ $justFinished });
       },
       // pause animations?
       pause() {

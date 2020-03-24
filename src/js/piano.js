@@ -27,6 +27,7 @@ function handleNewNote({ note, duration }) {
 
 function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const sequences = thisData.result.recent.slice(0, maxSequences);
+  const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
   const { tempo, sig } = thisData;
   // [[[63, 3], [67, 3], [63, 3]],
   //  [[63, 3], [67, 3], [63, 3]]]
@@ -35,6 +36,21 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
   // chart.update(sequenceProgress, jump: true);
   let seqIndex = 0;
+
+  if (staticData.length) {
+    seqIndex = staticData.length;
+    staticData.forEach(seq => {
+      sequenceProgress.push(seq);
+    });
+
+    chart.update({ sequenceProgress, jump: true });
+
+    const prePrinted = d3.range(staticSeq[0], staticSeq[1]);
+
+    prePrinted.forEach(seq => {
+      chart.moveSequence({ index: seq, jump: true });
+    });
+  }
 
   // handle start sequence, and moving on to new sequences
   let notesPlayed = 0;
@@ -48,7 +64,6 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
       sig,
       noteCallback: val => {
         // this runs for every note played
-        console.log({ sequenceProgress, seqIndex, val });
 
         // find the next note that needs to be played
         const note = val[notesPlayed];
@@ -58,17 +73,14 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
         // add this note to the sequence progress array
         sequenceProgress[seqIndex].push(note);
-        // console.log({ val, seqIndex, check: sequenceProgress[seqIndex] });
-        // [[{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }],
-        // [{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }]]
 
         // send the new note data to be updated
-        chart.update(sequenceProgress);
+        chart.update({ sequenceProgress, jump: false });
 
         // check if this was the last note of the sequence
         if (notesPlayed === val.length) {
           // update the sequence
-          chart.moveSequence(seqIndex);
+          chart.moveSequence({ index: seqIndex, jump: false });
           // move onto the next sequence
           seqIndex += 1;
           // start back at 0
@@ -108,8 +120,20 @@ function setupEnterView() {
       const thisData = rend.data();
       const maxSequences =
         condition === 'animated' ? 1 : thisData.result.attempts;
-      // rend.update();
-      playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
+
+      if (condition !== 'two') {
+        if (condition === 'results')
+          playChart({
+            chart: rend,
+            thisData,
+            maxSequences: 4,
+            staticSeq: [0, 1],
+          });
+        else if (condition === 'success')
+          playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 4] });
+        else
+          playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
+      }
     },
     offset: 0.25,
     once: true,
