@@ -1,8 +1,15 @@
 /* global d3 */
 import jump from 'jump.js';
+import loadData from './load-data';
+import dirtyCrosswalk from './pianoData.json';
+import findUnique from './utils/unique';
+import piano from './piano';
 
 const $intro = d3.select('#intro');
 const $header = d3.select('header');
+
+let cwMap = null;
+let data = [];
 
 function resize() {}
 
@@ -24,9 +31,71 @@ function handleIntro() {
   jump('article', { duration: 500 });
 }
 
+function findKeys({ range, crosswalk }) {
+  const midisSorted = range.sort(d3.ascending);
+  const endMidis = d3.extent(midisSorted);
+  const allMidis = d3.range(endMidis[0], endMidis[1]);
+
+  // find all octaves represented
+  const octaves = allMidis.map(d => cwMap.get(d)).filter(d => d);
+  const uniqueOctaves = findUnique(octaves);
+
+  // ensure full range encapsulated
+  const allOctaves = d3.range(
+    Math.min(...uniqueOctaves),
+    Math.max(...uniqueOctaves) + 1
+  );
+
+  const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
+
+  return keys;
+}
+
+function cleanCrosswalk(cw) {
+  const cleaned = cw.map(d => ({
+    ...d,
+    midi: +d.midi,
+    sharp: d.note.includes('#'),
+    octave: +d.octave,
+  }));
+
+  const cwData = cleaned.map(d => [d.midi, d.octave]);
+  cwMap = new Map(cwData);
+
+  return cleaned;
+}
+
+function cleanData({ result, crosswalk }) {
+  const cleanedLevels = result.levels.map(d => ({
+    ...d,
+    keys: findKeys({ range: d.range.midis, crosswalk }),
+  }));
+
+  const cleaned = [result].map(d => ({
+    ...d,
+    levels: cleanedLevels,
+  }))[0];
+
+  return cleaned;
+}
+
 function init() {
   $intro.selectAll('button').on('click', handleIntro);
   d3.select('.audio').on('click', handleHeader);
+
+  const v = Date.now();
+  const dataURL = `https://pudding.cool/2020/04/infinite-data/data.json?version=${v}`;
+  const crosswalk = cleanCrosswalk(dirtyCrosswalk);
+
+  loadData(dataURL)
+    .then(result => {
+      data = cleanData({ result, crosswalk });
+      console.log({ data });
+    })
+    .then(() => {
+      piano.init(data);
+    })
+    .catch(console.error);
 }
 
 export default { init, resize };
