@@ -143,8 +143,8 @@ d3.selection.prototype.noteChart = function init(options) {
 
     function isCorrect(note, index) {
       return (
-        note.midi === data.sequence[index].midi &&
-        note.duration === data.sequence[index].duration
+        note.midi === data.sequence[index][0] &&
+        note.duration === data.sequence[index][1]
       );
     }
 
@@ -379,50 +379,6 @@ d3.selection.prototype.noteChart = function init(options) {
 
         return Chart;
       },
-      play(sequence) {
-        console.log({ sequence });
-      },
-      setupSequences(seq) {
-        const seqLoc = [];
-
-        // add location data to the sequence data
-        seq.forEach(attempt => {
-          const cleaned = attempt.map(note => ({
-            midi: +note[0],
-            duration: +note[1],
-            coord: keyMap.get(+note[0]),
-          }));
-          seqLoc.push(cleaned);
-        });
-
-        const $group = $vis.select('.g-notes');
-
-        const $seq = $group
-          .selectAll('.sequence')
-          .data(seqLoc)
-          .join(enter =>
-            enter
-              .append('g')
-              .attr('class', 'sequence')
-              .attr('data-order', (d, i) => i)
-          );
-
-        $seq
-          .selectAll('.note')
-          .data(d => d)
-          .join(enter =>
-            enter
-              .append('rect')
-              .attr('class', 'note')
-              .attr('data-order', (d, i) => i)
-          )
-          .attr('x', width * 0.9)
-          .attr('y', d => d.coord.y.min)
-          .attr('width', d => scaleGuideBlock(1 / d.duration))
-          .attr('height', whiteWidth)
-          .style('fill', d => scaleColor(d.midi))
-          .classed('is-correct', (d, i) => isCorrect(d, i));
-      },
       update(sequenceData) {
         const $group = $vis.select('.g-notes');
 
@@ -450,41 +406,49 @@ d3.selection.prototype.noteChart = function init(options) {
               })
               .attr('width', d => scaleGuideBlock(1 / d[1]))
               .attr('height', whiteWidth)
-              .style('fill', d => scaleColor(d.midi))
+              .style('fill', d => scaleColor(d[0]))
               .classed('is-correct', (d, i) => isCorrect(d, i));
 
             $playedNote
               .transition()
-              .duration(300)
+              .duration(50)
               .attr('x', (d, i) => scaleXGuide(i));
           });
+      },
+      moveSequence(seqIndex) {
+        // set the just finished sequence class to finished
+        const $justFinished = $vis
+          .selectAll('.sequence')
+          .filter((d, i, n) => {
+            const order = d3.select(n[i]).attr('data-order');
+            console.log({ order, seqIndex });
+            return order === `${seqIndex}`;
+          })
+          .classed('finished', true);
 
-        // if results have already been generated
-        // if (data.result && thisChart !== 'two') {
-        //   const results = data.result.recent;
-        //   let seqPromise = Promise.resolve();
-        //   const interval = DURATION * 2;
+        $justFinished
+          .selectAll('.note')
+          .transition()
+          .delay(100)
+          .duration(300)
+          .attr('y', height * 0.5);
 
-        //   const filteredResults = results.filter(d => d.length > 1);
+        const $allFinished = $vis.selectAll('.finished').nodes();
+        $allFinished.forEach((g, index) => {
+          const played = d3.select(g);
+          // const staticPlayed = played.attr('data-static');
+          const slot = $allFinished.length - index;
 
-        //   filteredResults.forEach((d, i) => {
-        //     const staticSeq = d3.selectAll(`[data-order='${i}']`);
-        //     seqPromise = seqPromise
-        //       .then(() => {
-        //         setupNoteGroup(d, i);
-        //         return new Promise(resolve => {
-        //           setTimeout(resolve, interval);
-        //         });
-        //       })
-        //       .then(() => {
-        //         moveNoteGroup(i);
+          played
+            .transition()
+            .duration(200)
+            .attr(
+              'transform',
+              `translate(0, ${(whiteWidth + PADDING) * slot})`
+            );
+        });
 
-        //         return new Promise(resolve => {
-        //           setTimeout(resolve, interval);
-        //         });
-        //       });
-        //   });
-        // }
+        console.log({ $justFinished });
       },
       // pause animations?
       pause() {

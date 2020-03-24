@@ -67,13 +67,16 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
         // check if this was the last note of the sequence
         if (notesPlayed === val.length) {
+          // update the sequence
+          chart.moveSequence(seqIndex);
           // move onto the next sequence
           seqIndex += 1;
           // start back at 0
           notesPlayed = 0;
 
           // if we haven't hit the last sequence, do this again
-          if (seqIndex < sequences.length) playNextSequence();
+          if (seqIndex < sequences.length)
+            setTimeout(() => playNextSequence(), 500);
         }
         // notesPlayed += 1;
         // if (done with sequence) {
