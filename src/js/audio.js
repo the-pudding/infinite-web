@@ -17,10 +17,12 @@ function stop() {
 function play({ sequence, tempo, sig, noteCallback }) {
   stop();
   part.removeAll();
-  const values = midiToNotation(sequence);
+  const s = sequence.map(d => ({ midi: d[0], duration: d[1] }));
+  const results = midiToNotation(s);
+  const values = results.notesNoRests;
+  const original = results.originalNotes;
   part = new Tone.Part((time, value) => {
-    console.log({ value });
-    noteCallback(value);
+    noteCallback(original);
     sampler.triggerAttackRelease(value.note, value.duration, time);
   }, values).start(0);
   Tone.Transport.bpm.value = tempo;

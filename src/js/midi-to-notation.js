@@ -26,5 +26,6 @@ export default function midiToNotation(arr) {
   });
 
   const notesNoRests = b.filter(d => d.note);
-  return notesNoRests;
+  const flat = arr.map(d => [d.midi, d.duration]);
+  return { notesNoRests, originalNotes: flat };
 }

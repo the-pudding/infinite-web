@@ -423,33 +423,68 @@ d3.selection.prototype.noteChart = function init(options) {
           .style('fill', d => scaleColor(d.midi))
           .classed('is-correct', (d, i) => isCorrect(d, i));
       },
-      update() {
-        // if results have already been generated
-        if (data.result && thisChart !== 'two') {
-          const results = data.result.recent;
-          let seqPromise = Promise.resolve();
-          const interval = DURATION * 2;
+      update(sequenceData) {
+        const $group = $vis.select('.g-notes');
 
-          const filteredResults = results.filter(d => d.length > 1);
+        const $seq = $group
+          .selectAll('.sequence')
+          .data(sequenceData)
+          .join(enter =>
+            enter
+              .append('g')
+              .attr('class', 'sequence')
+              .attr('data-order', (d, i) => i)
+          );
 
-          filteredResults.forEach((d, i) => {
-            const staticSeq = d3.selectAll(`[data-order='${i}']`);
-            seqPromise = seqPromise
-              .then(() => {
-                setupNoteGroup(d, i);
-                return new Promise(resolve => {
-                  setTimeout(resolve, interval);
-                });
+        $seq
+          .selectAll('.note')
+          .data(d => d)
+          .join(enter => {
+            const $playedNote = enter
+              .append('rect')
+              .attr('class', 'note')
+              .attr('x', width * 0.9)
+              .attr('y', d => {
+                const coord = keyMap.get(+d[0]);
+                return coord.y.min;
               })
-              .then(() => {
-                moveNoteGroup(i);
+              .attr('width', d => scaleGuideBlock(1 / d[1]))
+              .attr('height', whiteWidth)
+              .style('fill', d => scaleColor(d.midi))
+              .classed('is-correct', (d, i) => isCorrect(d, i));
 
-                return new Promise(resolve => {
-                  setTimeout(resolve, interval);
-                });
-              });
+            $playedNote
+              .transition()
+              .duration(300)
+              .attr('x', (d, i) => scaleXGuide(i));
           });
-        }
+
+        // if results have already been generated
+        // if (data.result && thisChart !== 'two') {
+        //   const results = data.result.recent;
+        //   let seqPromise = Promise.resolve();
+        //   const interval = DURATION * 2;
+
+        //   const filteredResults = results.filter(d => d.length > 1);
+
+        //   filteredResults.forEach((d, i) => {
+        //     const staticSeq = d3.selectAll(`[data-order='${i}']`);
+        //     seqPromise = seqPromise
+        //       .then(() => {
+        //         setupNoteGroup(d, i);
+        //         return new Promise(resolve => {
+        //           setTimeout(resolve, interval);
+        //         });
+        //       })
+        //       .then(() => {
+        //         moveNoteGroup(i);
+
+        //         return new Promise(resolve => {
+        //           setTimeout(resolve, interval);
+        //         });
+        //       });
+        //   });
+        // }
       },
       // pause animations?
       pause() {

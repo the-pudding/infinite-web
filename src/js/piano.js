@@ -30,14 +30,14 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const { tempo, sig } = thisData;
   // [[[63, 3], [67, 3], [63, 3]],
   //  [[63, 3], [67, 3], [63, 3]]]
-  console.log({ tempo, sig, sequences });
   // chart.setupSequences(sequences);
   const sequenceProgress = [];
+
   // chart.update(sequenceProgress, jump: true);
   const seqIndex = 0;
 
   // handle start sequence, and moving on to new sequences
-  // let notesPlayed = 0;
+  let notesPlayed = 0;
 
   const playNextSeqence = () => {
     sequenceProgress.push([]);
@@ -47,12 +47,25 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
       tempo,
       sig,
       noteCallback: val => {
-        console.log({ val });
-        sequenceProgress[seqIndex].push(val);
-        console.log({ sequenceProgress });
+        // this runs for every note played
+        let newSequence = null;
+        if (notesPlayed === 0) newSequence = true;
+        else newSequence = false;
+
+        // find the next note that needs to be played
+        const note = val[notesPlayed];
+
+        // adjust the number of notes now played
+        notesPlayed += 1;
+
+        // add this note to the sequence progress array
+        sequenceProgress[seqIndex].push(note);
+        // console.log({ val, seqIndex, check: sequenceProgress[seqIndex] });
         // [[{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }],
         // [{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }]]
-        chart.update(sequenceProgress);
+
+        // send the new note data to be updated
+        chart.update(sequenceProgress, newSequence, seqIndex);
         // notesPlayed += 1;
         // if (done with sequence) {
         // seqIndex +=1;
