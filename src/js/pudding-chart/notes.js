@@ -382,6 +382,47 @@ d3.selection.prototype.noteChart = function init(options) {
       play(sequence) {
         console.log({ sequence });
       },
+      setupSequences(seq) {
+        const seqLoc = [];
+
+        // add location data to the sequence data
+        seq.forEach(attempt => {
+          const cleaned = attempt.map(note => ({
+            midi: +note[0],
+            duration: +note[1],
+            coord: keyMap.get(+note[0]),
+          }));
+          seqLoc.push(cleaned);
+        });
+
+        const $group = $vis.select('.g-notes');
+
+        const $seq = $group
+          .selectAll('.sequence')
+          .data(seqLoc)
+          .join(enter =>
+            enter
+              .append('g')
+              .attr('class', 'sequence')
+              .attr('data-order', (d, i) => i)
+          );
+
+        $seq
+          .selectAll('.note')
+          .data(d => d)
+          .join(enter =>
+            enter
+              .append('rect')
+              .attr('class', 'note')
+              .attr('data-order', (d, i) => i)
+          )
+          .attr('x', width * 0.9)
+          .attr('y', d => d.coord.y.min)
+          .attr('width', d => scaleGuideBlock(1 / d.duration))
+          .attr('height', whiteWidth)
+          .style('fill', d => scaleColor(d.midi))
+          .classed('is-correct', (d, i) => isCorrect(d, i));
+      },
       update() {
         // if results have already been generated
         if (data.result && thisChart !== 'two') {

@@ -25,7 +25,11 @@ function handleNewNote({ note, duration }) {
   // tell chart to update with new note and duration
 }
 
-function playChart() {
+function playChart({ chart, thisData, maxSequences, staticSeq }) {
+  const sequences = thisData.result.recent.slice(0, maxSequences);
+  console.log({ sequences });
+  chart.setupSequences(sequences);
+
   // handle start sequence, and moving on to new sequences
   // let notesPlayed = 0;
   // Audio.play({ sequence, tempo, sig, noteCallback: () => {
@@ -47,8 +51,11 @@ function setupEnterView() {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
       const rend = charts[condition];
-      rend.update();
-      playChart();
+      const thisData = rend.data();
+      const maxSequences =
+        condition === 'animated' ? 1 : thisData.result.attempts;
+      // rend.update();
+      playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
     },
     offset: 0.25,
     once: true,
