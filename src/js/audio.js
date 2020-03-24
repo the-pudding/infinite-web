@@ -19,6 +19,7 @@ function play({ sequence, tempo, sig, noteCallback }) {
   part.removeAll();
   const values = midiToNotation(sequence);
   part = new Tone.Part((time, value) => {
+    console.log({ value });
     noteCallback(value);
     sampler.triggerAttackRelease(value.note, value.duration, time);
   }, values).start(0);

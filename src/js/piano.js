@@ -27,15 +27,44 @@ function handleNewNote({ note, duration }) {
 
 function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const sequences = thisData.result.recent.slice(0, maxSequences);
-  console.log({ sequences });
-  chart.setupSequences(sequences);
+  const { tempo, sig } = thisData;
+  // [[[63, 3], [67, 3], [63, 3]],
+  //  [[63, 3], [67, 3], [63, 3]]]
+  console.log({ tempo, sig, sequences });
+  // chart.setupSequences(sequences);
+  const sequenceProgress = [];
+  // chart.update(sequenceProgress, jump: true);
+  const seqIndex = 0;
 
   // handle start sequence, and moving on to new sequences
   // let notesPlayed = 0;
-  // Audio.play({ sequence, tempo, sig, noteCallback: () => {
-  // notesPlayed += 1;
-  // conditional;
-  // } });
+
+  const playNextSeqence = () => {
+    sequenceProgress.push([]);
+    const sequence = sequences[seqIndex];
+    Audio.play({
+      sequence,
+      tempo,
+      sig,
+      noteCallback: val => {
+        console.log({ val });
+        sequenceProgress[seqIndex].push(val);
+        console.log({ sequenceProgress });
+        // [[{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }],
+        // [{ midi: 67, duration: 3 }, { midi: 67, duration: 3 }]]
+        chart.update(sequenceProgress);
+        // notesPlayed += 1;
+        // if (done with sequence) {
+        // seqIndex +=1;
+        // if (seqIndex < sequences.length)
+        //   // playNextSequence();
+        // }
+        // }
+      },
+    });
+  };
+
+  playNextSeqence();
 }
 
 function setupEnterView() {
