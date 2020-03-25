@@ -21,12 +21,20 @@ function stop() {
   Tone.Transport.stop();
 }
 
-function clickKey(note) {
-  synth.triggerAttack(note);
-}
-
-function keyUp() {
-  synth.triggerRelease();
+function clickKey(midi) {
+  stop();
+  part.removeAll();
+  // const s = sequence.map(d => ({ midi: d[0], duration: d[1] }));
+  const results = midiToNotation([{ midi, duration: 3 }]);
+  const values = results.notesNoRests;
+  console.log({ values });
+  part = new Tone.Part((time, value) => {
+    console.log({ time, value });
+    sampler.triggerAttackRelease(value.note, value.duration, time);
+  }, values).start(0);
+  Tone.Transport.bpm.value = 80;
+  Tone.Transport.timeSignature = 4;
+  Tone.Transport.start();
 }
 
 function play({ sequence, tempo, sig, noteCallback }) {
@@ -37,6 +45,7 @@ function play({ sequence, tempo, sig, noteCallback }) {
   const values = results.notesNoRests;
   const original = results.originalNotes;
   part = new Tone.Part((time, value) => {
+    console.log({ time, value });
     noteCallback(original);
     sampler.triggerAttackRelease(value.note, value.duration, time);
   }, values).start(0);
@@ -45,4 +54,4 @@ function play({ sequence, tempo, sig, noteCallback }) {
   Tone.Transport.start();
 }
 
-export default { play, stop, clickKey, keyUp };
+export default { play, stop, clickKey };

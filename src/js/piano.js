@@ -104,20 +104,14 @@ function makeKeysClickable() {
   const $piano = $figure.select('.g-piano');
   const $activeKeys = $piano.selectAll('.active');
 
-  $activeKeys
-    .on('mousedown', function() {
-      const key = d3.select(this);
-      const midi = key.attr('data-midi');
-      const match = crosswalk.find(p => +p.midi === +midi);
-      const note = match ? `${match.note}${match.octave}` : null;
-      Audio.clickKey(note);
-      charts.two.pressKey({ key });
-    })
-    .on('mouseup', function() {
-      const key = d3.select(this);
-      Audio.keyUp();
-      charts.two.releaseKey({ key });
-    });
+  $activeKeys.on('click', function() {
+    const key = d3.select(this);
+    const midi = key.attr('data-midi');
+    const match = crosswalk.find(p => +p.midi === +midi);
+    const note = match ? `${match.note}${match.octave}` : null;
+    Audio.clickKey(+midi);
+    charts.two.pressKey({ key });
+  });
 }
 
 function setupEnterView() {

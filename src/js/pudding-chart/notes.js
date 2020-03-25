@@ -222,7 +222,10 @@ d3.selection.prototype.noteChart = function init(options) {
         key
           .transition()
           .duration(100)
-          .style('fill', d => scaleColor(d.midi));
+          .style('fill', d => scaleColor(d.midi))
+          .transition()
+          .duration(100)
+          .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
 
         const keyData = key.data();
         const { coord, midi } = keyData[0];
@@ -238,12 +241,6 @@ d3.selection.prototype.noteChart = function init(options) {
           .transition()
           .duration(1000)
           .attr('x', -width);
-      },
-      releaseKey({ key }) {
-        key
-          .transition()
-          .duration(100)
-          .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
       },
       update({ sequenceProgress, jump }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
