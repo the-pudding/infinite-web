@@ -6,6 +6,7 @@ import graphic from './graphic';
 import piano from './piano';
 import probability from './probability';
 import clock from './clock';
+import results from './results';
 import footer from './footer';
 import loadData from './load-data';
 
@@ -40,6 +41,7 @@ function begin(data) {
   graphic.init();
   piano.init();
   probability.init();
+  results.init(data);
   clock.init(data);
   // load footer stories
   footer.init();
