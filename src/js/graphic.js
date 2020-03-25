@@ -4,6 +4,7 @@ import loadData from './load-data';
 import dirtyCrosswalk from './pianoData.json';
 import findUnique from './utils/unique';
 import piano from './piano';
+import Audio from './audio';
 
 const $intro = d3.select('#intro');
 const $header = d3.select('header');
@@ -20,6 +21,7 @@ function toggleAudio(dir) {
   $intro.select('.intro__overline span').text(over);
   $header.select('.on').classed('is-visible', goOn);
   $header.select('.off').classed('is-visible', !goOn);
+  Audio.mute(!goOn);
 }
 function handleHeader() {
   toggleAudio();
@@ -83,6 +85,9 @@ function cleanData({ raw, crosswalk }) {
 function init(raw) {
   $intro.selectAll('button').on('click', handleIntro);
   d3.select('.audio').on('click', handleHeader);
+
+  // start muted
+  Audio.mute(true);
 
   const crosswalk = cleanCrosswalk(dirtyCrosswalk);
   data = cleanData({ raw, crosswalk });
