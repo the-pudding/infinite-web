@@ -36,10 +36,10 @@ function setupStickyHeader() {
 }
 
 function begin(data) {
-  graphic.init();
-  probability.init();
+  graphic.init(data);
   results.init(data);
   clock.init(data);
+  probability.init();
   // load footer stories
   footer.init();
 }

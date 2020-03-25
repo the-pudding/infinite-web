@@ -65,13 +65,13 @@ function cleanCrosswalk(cw) {
   return cleaned;
 }
 
-function cleanData({ result, crosswalk }) {
-  const cleanedLevels = result.levels.map(d => ({
+function cleanData({ raw, crosswalk }) {
+  const cleanedLevels = raw.levels.map(d => ({
     ...d,
     keys: findKeys({ range: d.range.midis, crosswalk }),
   }));
 
-  const cleaned = [result].map(d => ({
+  const cleaned = [raw].map(d => ({
     ...d,
     levels: cleanedLevels,
   }))[0];
@@ -79,23 +79,13 @@ function cleanData({ result, crosswalk }) {
   return cleaned;
 }
 
-function init() {
+function init(raw) {
   $intro.selectAll('button').on('click', handleIntro);
   d3.select('.audio').on('click', handleHeader);
 
-  const v = Date.now();
-  const dataURL = `https://pudding.cool/2020/04/infinite-data/data.json?version=${v}`;
   const crosswalk = cleanCrosswalk(dirtyCrosswalk);
-
-  loadData(dataURL)
-    .then(result => {
-      data = cleanData({ result, crosswalk });
-      console.log({ data });
-    })
-    .then(() => {
-      piano.init({ levels: data, cw: crosswalk });
-    })
-    .catch(console.error);
+  data = cleanData({ raw, crosswalk });
+  piano.init({ levels: data, cw: crosswalk });
 }
 
 export default { init, resize };
