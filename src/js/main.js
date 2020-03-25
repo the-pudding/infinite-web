@@ -5,6 +5,7 @@ import linkFix from './utils/link-fix';
 import graphic from './graphic';
 import probability from './probability';
 import clock from './clock';
+import results from './results';
 import footer from './footer';
 import loadData from './load-data';
 
@@ -37,6 +38,7 @@ function setupStickyHeader() {
 function begin(data) {
   graphic.init();
   probability.init();
+  results.init(data);
   clock.init(data);
   // load footer stories
   footer.init();

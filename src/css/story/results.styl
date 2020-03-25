@@ -1,0 +1,28 @@
+.figure__results
+	max-width 60rem
+
+	table
+		width 100%
+
+	td, th
+		padding 0.5em
+		text-align right
+
+	th
+		vertical-align bottom
+		font-size 0.8em
+
+	tbody tr
+		border-top 1px dashed $fg
+		vertical-align middle
+		font-size 0.7em
+
+		&.is-success
+			background-color rgba($right, 0.33)
+
+	td:nth-child(1), th:nth-child(1)
+		text-align left
+
+		span
+			display block
+			font-size 0.8em
