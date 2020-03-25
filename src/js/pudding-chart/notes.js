@@ -191,7 +191,7 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('height', d => d.coord.y.max - d.coord.y.min);
 
         const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
-        console.log({ restCoord });
+
         // add text to rest key
         $vis
           .select('.g-piano')

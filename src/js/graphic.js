@@ -34,10 +34,10 @@ function handleIntro() {
 function findKeys({ range, crosswalk }) {
   const midisSorted = range.sort(d3.ascending);
   const endMidis = d3.extent(midisSorted);
-  const allMidis = d3.range(endMidis[0], endMidis[1]);
+  const allMidis = d3.range(endMidis[0], endMidis[1] + 1);
 
   // find all octaves represented
-  const octaves = allMidis.map(d => cwMap.get(d)).filter(d => d);
+  const octaves = allMidis.map(d => cwMap.get(d)); // .filter(d => d);
   const uniqueOctaves = findUnique(octaves);
 
   // ensure full range encapsulated
@@ -48,7 +48,6 @@ function findKeys({ range, crosswalk }) {
 
   const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
   keys.push({ midi: 0, note: 'rest', sharp: false });
-  console.log({ keys });
 
   return keys;
 }

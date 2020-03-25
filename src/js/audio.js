@@ -27,9 +27,7 @@ function clickKey(midi) {
   // const s = sequence.map(d => ({ midi: d[0], duration: d[1] }));
   const results = midiToNotation([{ midi, duration: 3 }]);
   const values = results.notesNoRests;
-  console.log({ values });
   part = new Tone.Part((time, value) => {
-    console.log({ time, value });
     sampler.triggerAttackRelease(value.note, value.duration, time);
   }, values).start(0);
   Tone.Transport.bpm.value = 80;
@@ -45,7 +43,6 @@ function play({ sequence, tempo, sig, noteCallback }) {
   const values = results.notesNoRests;
   const original = results.originalNotes;
   part = new Tone.Part((time, value) => {
-    console.log({ time, value });
     noteCallback(original);
     sampler.triggerAttackRelease(value.note, value.duration, time);
   }, values).start(0);
