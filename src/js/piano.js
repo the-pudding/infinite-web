@@ -1,114 +1,177 @@
-import loadData from './load-data';
-import findUnique from './utils/unique';
+import EnterView from 'enter-view';
+import Audio from './audio';
 import './pudding-chart/notes';
 
 const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
-const charts = [];
+const charts = {};
 
 let data = [];
 let crosswalk = [];
-let cwMap = [];
+
+function filterData(condition) {
+  let specificData = null;
+  // separate out phases for the first few steps which repeat the same piano
+  const setupPianos = ['two', 'animated', 'results', 'success'];
+  if (setupPianos.includes(condition)) {
+    [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5 I');
+  } else if (condition === 'Meryl') {
+    [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5  II');
+  } else {
+    // find which songs already have results
+    const hasResults = data.levels.filter(d => d.result);
+
+    // keep last one (presumably the one still running)
+    const inProgress = hasResults.pop();
+
+    specificData = inProgress;
+  }
+
+  return specificData;
+}
+
+function playChart({ chart, thisData, maxSequences, staticSeq }) {
+  const sequences = thisData.result.recent.slice(0, maxSequences);
+  const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
+  const { tempo, sig } = thisData;
+
+  const sequenceProgress = [];
+
+  let seqIndex = 0;
+
+  if (staticData.length) {
+    seqIndex = staticData.length;
+    staticData.forEach(seq => {
+      sequenceProgress.push(seq);
+    });
+
+    chart.update({ sequenceProgress, jump: true });
+
+    const prePrinted = d3.range(staticSeq[0], staticSeq[1]);
+
+    prePrinted.forEach(seq => {
+      chart.moveSequence({ index: seq, jump: true });
+    });
+  }
+
+  // handle start sequence, and moving on to new sequences
+  let notesPlayed = 0;
+
+  const playNextSequence = () => {
+    sequenceProgress.push([]);
+    const sequence = sequences[seqIndex];
+    Audio.play({
+      sequence,
+      tempo,
+      sig,
+      noteCallback: val => {
+        // this runs for every note played
+
+        // find the next note that needs to be played
+        const note = val[notesPlayed];
+
+        // adjust the number of notes now played
+        notesPlayed += 1;
+
+        // add this note to the sequence progress array
+        sequenceProgress[seqIndex].push(note);
+
+        // send the new note data to be updated
+        chart.update({ sequenceProgress, jump: false });
+
+        // check if this was the last note of the sequence
+        if (notesPlayed === val.length) {
+          // update the sequence
+          chart.moveSequence({ index: seqIndex, jump: false });
+          // move onto the next sequence
+          seqIndex += 1;
+          // start back at 0
+          notesPlayed = 0;
+
+          // if we haven't hit the last sequence, do this again
+          if (seqIndex < sequences.length)
+            setTimeout(() => playNextSequence(), 500);
+        }
+      },
+    });
+  };
+
+  playNextSequence();
+}
+
+function makeKeysClickable() {
+  const $figure = d3.select(`[data-type='two']`);
+  const $piano = $figure.select('.g-piano');
+  const $activeKeys = $piano.selectAll('.active');
+
+  $activeKeys
+    .on('mousedown', function() {
+      const key = d3.select(this);
+      const midi = key.attr('data-midi');
+      const match = crosswalk.find(p => +p.midi === +midi);
+      const note = match ? `${match.note}${match.octave}` : null;
+      Audio.clickKey(note);
+      charts.two.pressKey({ key });
+    })
+    .on('mouseup', function() {
+      const key = d3.select(this);
+      Audio.keyUp();
+      charts.two.releaseKey({ key });
+    });
+}
+
+function setupEnterView() {
+  EnterView({
+    selector: '.figure__piano',
+    enter(el, i) {
+      // pause other charts
+      Object.keys(charts).map(d => {
+        const val = charts[d];
+        Audio.stop();
+      });
+
+      // select the currently entered chart and update/play it
+      const condition = d3.select(el).attr('data-type');
+      const rend = charts[condition];
+      const thisData = rend.data();
+      const maxSequences =
+        condition === 'animated' ? 1 : thisData.result.attempts;
+
+      if (condition !== 'two') {
+        if (condition === 'results')
+          playChart({
+            chart: rend,
+            thisData,
+            maxSequences: 4,
+            staticSeq: [0, 1],
+          });
+        else if (condition === 'success')
+          playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 4] });
+        else
+          playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
+      } else makeKeysClickable();
+    },
+    offset: 0.25,
+    once: true,
+  });
+}
 
 function setupCharts() {
   const $sel = d3.select(this);
   const condition = $sel.attr('data-type');
-  let specificData = [];
-
-  // separate out phases for the first few steps which repeat the same piano
-  const setupPianos = ['two', 'animated', 'results', 'success'];
-  if (setupPianos.includes(condition)) {
-    const filteredData = data.levels.filter(
-      d => d.title === 'Symphony No. 5 I'
-    )[0];
-    if (condition === 'animated') {
-      // console.log({ filteredData });
-      specificData = [filteredData].map(d => {
-        return {
-          ...d,
-          result: [d.result].map(e => {
-            // console.log({ e });
-            return {
-              ...e,
-              recent: [e.recent[0]],
-            };
-          })[0],
-        };
-      })[0];
-    } else specificData = filteredData;
-    // console.log({ specificData });
-  } else if (condition === 'Meryl')
-    specificData = data.levels.filter(d => d.title === 'Symphony No. 5  II')[0];
-  else specificData = data.levels.filter(d => d.title === 'Ice Ice Baby')[0];
+  const specificData = filterData(condition);
 
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
-  charts.push(chart);
+  charts[condition] = chart;
 }
 
-function findKeys(range) {
-  const midisSorted = range.sort(d3.ascending);
-  const endMidis = d3.extent(midisSorted);
-  const allMidis = d3.range(endMidis[0], endMidis[1]);
-
-  // find all octaves represented
-  const octaves = allMidis.map(d => cwMap.get(d)).filter(d => d);
-  const uniqueOctaves = findUnique(octaves);
-
-  // ensure full range encapsulated
-  const allOctaves = d3.range(
-    Math.min(...uniqueOctaves),
-    Math.max(...uniqueOctaves) + 1
-  );
-
-  const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
-
-  return keys;
-}
-
-function cleanCrosswalk(cw) {
-  const cleaned = cw.map(d => ({
-    ...d,
-    midi: +d.midi,
-    sharp: d.note.includes('#'),
-    octave: +d.octave,
-  }));
-
-  const cwData = cleaned.map(d => [d.midi, d.octave]);
-  cwMap = new Map(cwData);
-
-  return cleaned;
-}
-
-function cleanData(dat) {
-  const cleanedLevels = dat.levels.map(d => ({
-    ...d,
-    keys: findKeys(d.range.midis),
-  }));
-
-  const cleaned = [dat].map(d => ({
-    ...d,
-    levels: cleanedLevels,
-  }))[0];
-
-  return cleaned;
-}
-
-function init() {
-  const v = Date.now();
-  const dataURL = `https://pudding.cool/2020/04/infinite-data/data.json?version=${v}`;
-
-  loadData([dataURL, './crosswalk.csv'])
-    .then(result => {
-      crosswalk = cleanCrosswalk(result[1]);
-      return result[0];
-    })
-    .then(result => {
-      data = cleanData(result);
-      // console.log({ data });
-      $pianos.each(setupCharts);
-    })
-    .catch(console.log);
+function init({ levels, cw }) {
+  data = levels;
+  crosswalk = cw;
+  // scroll triggers
+  $pianos.each(setupCharts);
+  setupEnterView();
 }
 
 function resize() {

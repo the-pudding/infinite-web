@@ -1,0 +1,442 @@
+[
+    {
+        "midi": 21,
+        "note": "A",
+        "octave": 0
+    },
+    {
+        "midi": 22,
+        "note": "A#",
+        "octave": 0
+    },
+    {
+        "midi": 23,
+        "note": "B",
+        "octave": 0
+    },
+    {
+        "midi": 24,
+        "note": "C",
+        "octave": 1
+    },
+    {
+        "midi": 25,
+        "note": "C#",
+        "octave": 1
+    },
+    {
+        "midi": 26,
+        "note": "D",
+        "octave": 1
+    },
+    {
+        "midi": 27,
+        "note": "D#",
+        "octave": 1
+    },
+    {
+        "midi": 28,
+        "note": "E",
+        "octave": 1
+    },
+    {
+        "midi": 29,
+        "note": "F",
+        "octave": 1
+    },
+    {
+        "midi": 30,
+        "note": "F#",
+        "octave": 1
+    },
+    {
+        "midi": 31,
+        "note": "G",
+        "octave": 1
+    },
+    {
+        "midi": 32,
+        "note": "G#",
+        "octave": 1
+    },
+    {
+        "midi": 33,
+        "note": "A",
+        "octave": 1
+    },
+    {
+        "midi": 34,
+        "note": "A#",
+        "octave": 1
+    },
+    {
+        "midi": 35,
+        "note": "B",
+        "octave": 1
+    },
+    {
+        "midi": 36,
+        "note": "C",
+        "octave": 2
+    },
+    {
+        "midi": 37,
+        "note": "C#",
+        "octave": 2
+    },
+    {
+        "midi": 38,
+        "note": "D",
+        "octave": 2
+    },
+    {
+        "midi": 39,
+        "note": "D#",
+        "octave": 2
+    },
+    {
+        "midi": 40,
+        "note": "E",
+        "octave": 2
+    },
+    {
+        "midi": 41,
+        "note": "F",
+        "octave": 2
+    },
+    {
+        "midi": 42,
+        "note": "F#",
+        "octave": 2
+    },
+    {
+        "midi": 43,
+        "note": "G",
+        "octave": 2
+    },
+    {
+        "midi": 44,
+        "note": "G#",
+        "octave": 2
+    },
+    {
+        "midi": 45,
+        "note": "A",
+        "octave": 2
+    },
+    {
+        "midi": 46,
+        "note": "A#",
+        "octave": 2
+    },
+    {
+        "midi": 47,
+        "note": "B",
+        "octave": 2
+    },
+    {
+        "midi": 48,
+        "note": "C",
+        "octave": 3
+    },
+    {
+        "midi": 49,
+        "note": "C#",
+        "octave": 3
+    },
+    {
+        "midi": 50,
+        "note": "D",
+        "octave": 3
+    },
+    {
+        "midi": 51,
+        "note": "D#",
+        "octave": 3
+    },
+    {
+        "midi": 52,
+        "note": "E",
+        "octave": 3
+    },
+    {
+        "midi": 53,
+        "note": "F",
+        "octave": 3
+    },
+    {
+        "midi": 54,
+        "note": "F#",
+        "octave": 3
+    },
+    {
+        "midi": 55,
+        "note": "G",
+        "octave": 3
+    },
+    {
+        "midi": 56,
+        "note": "G#",
+        "octave": 3
+    },
+    {
+        "midi": 57,
+        "note": "A",
+        "octave": 3
+    },
+    {
+        "midi": 58,
+        "note": "A#",
+        "octave": 3
+    },
+    {
+        "midi": 59,
+        "note": "B",
+        "octave": 3
+    },
+    {
+        "midi": 60,
+        "note": "C",
+        "octave": 4
+    },
+    {
+        "midi": 61,
+        "note": "C#",
+        "octave": 4
+    },
+    {
+        "midi": 62,
+        "note": "D",
+        "octave": 4
+    },
+    {
+        "midi": 63,
+        "note": "D#",
+        "octave": 4
+    },
+    {
+        "midi": 64,
+        "note": "E",
+        "octave": 4
+    },
+    {
+        "midi": 65,
+        "note": "F",
+        "octave": 4
+    },
+    {
+        "midi": 66,
+        "note": "F#",
+        "octave": 4
+    },
+    {
+        "midi": 67,
+        "note": "G",
+        "octave": 4
+    },
+    {
+        "midi": 68,
+        "note": "G#",
+        "octave": 4
+    },
+    {
+        "midi": 69,
+        "note": "A",
+        "octave": 4
+    },
+    {
+        "midi": 70,
+        "note": "A#",
+        "octave": 4
+    },
+    {
+        "midi": 71,
+        "note": "B",
+        "octave": 4
+    },
+    {
+        "midi": 72,
+        "note": "C",
+        "octave": 5
+    },
+    {
+        "midi": 73,
+        "note": "C#",
+        "octave": 5
+    },
+    {
+        "midi": 74,
+        "note": "D",
+        "octave": 5
+    },
+    {
+        "midi": 75,
+        "note": "D#",
+        "octave": 5
+    },
+    {
+        "midi": 76,
+        "note": "E",
+        "octave": 5
+    },
+    {
+        "midi": 77,
+        "note": "F",
+        "octave": 5
+    },
+    {
+        "midi": 78,
+        "note": "F#",
+        "octave": 5
+    },
+    {
+        "midi": 79,
+        "note": "G",
+        "octave": 5
+    },
+    {
+        "midi": 80,
+        "note": "G#",
+        "octave": 5
+    },
+    {
+        "midi": 81,
+        "note": "A",
+        "octave": 5
+    },
+    {
+        "midi": 82,
+        "note": "A#",
+        "octave": 5
+    },
+    {
+        "midi": 83,
+        "note": "B",
+        "octave": 5
+    },
+    {
+        "midi": 84,
+        "note": "C",
+        "octave": 6
+    },
+    {
+        "midi": 85,
+        "note": "C#",
+        "octave": 6
+    },
+    {
+        "midi": 86,
+        "note": "D",
+        "octave": 6
+    },
+    {
+        "midi": 87,
+        "note": "D#",
+        "octave": 6
+    },
+    {
+        "midi": 88,
+        "note": "E",
+        "octave": 6
+    },
+    {
+        "midi": 89,
+        "note": "F",
+        "octave": 6
+    },
+    {
+        "midi": 90,
+        "note": "F#",
+        "octave": 6
+    },
+    {
+        "midi": 91,
+        "note": "G",
+        "octave": 6
+    },
+    {
+        "midi": 92,
+        "note": "G#",
+        "octave": 6
+    },
+    {
+        "midi": 93,
+        "note": "A",
+        "octave": 6
+    },
+    {
+        "midi": 94,
+        "note": "A#",
+        "octave": 6
+    },
+    {
+        "midi": 95,
+        "note": "B",
+        "octave": 6
+    },
+    {
+        "midi": 96,
+        "note": "C",
+        "octave": 7
+    },
+    {
+        "midi": 97,
+        "note": "C#",
+        "octave": 7
+    },
+    {
+        "midi": 98,
+        "note": "D",
+        "octave": 7
+    },
+    {
+        "midi": 99,
+        "note": "D#",
+        "octave": 7
+    },
+    {
+        "midi": 100,
+        "note": "E",
+        "octave": 7
+    },
+    {
+        "midi": 101,
+        "note": "F",
+        "octave": 7
+    },
+    {
+        "midi": 102,
+        "note": "F#",
+        "octave": 7
+    },
+    {
+        "midi": 103,
+        "note": "G",
+        "octave": 7
+    },
+    {
+        "midi": 104,
+        "note": "G#",
+        "octave": 7
+    },
+    {
+        "midi": 105,
+        "note": "A",
+        "octave": 7
+    },
+    {
+        "midi": 106,
+        "note": "A#",
+        "octave": 7
+    },
+    {
+        "midi": 107,
+        "note": "B",
+        "octave": 7
+    },
+    {
+        "midi": 108,
+        "note": "C",
+        "octave": 8
+    }
+]

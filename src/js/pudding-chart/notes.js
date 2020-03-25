@@ -17,6 +17,7 @@ d3.selection.prototype.noteChart = function init(options) {
     let $gSeq = null;
     const $axis = null;
     let $vis = null;
+    const thisChart = $chart.attr('data-type');
 
     // data
     let data = $chart.datum();
@@ -35,45 +36,18 @@ d3.selection.prototype.noteChart = function init(options) {
     let whiteWidth = 0;
     const PADDING = 10;
 
-    // animation constants
-    let DURATION = 0;
-    let DELAY = 0;
-
-    // assuming 120 beats per minute (2 per second or 30 whole notes per minute)
-    // assuming 4/4 tempo
-    // 1 measure = 1 whole note
-    // 1 measure in 2 seconds
-    const BPM = data.tempo;
-    const minute = 60000;
-    const BEAT_LENGTH = Math.floor(minute / BPM);
-
-    // sequences that have already played
-    const finishedSeq = [];
-
     // scales
     const scaleXGuide = d3.scaleBand();
     const scaleGuideBlock = d3.scaleLinear();
-    const scaleY = null;
+
     const scaleColor = d3
       .scaleOrdinal()
-      .range(['#FF533D', '#4717F6', '#E5E338', '#A239CA', '#34A29E']);
+      .range(['#ff5470', '#00ebc7', '#fde24f', '#A239CA', '#34A29E']);
 
     // helper functions
 
     function findUnique(arr) {
       return [...new Set(arr)];
-    }
-
-    function findDuration() {
-      const correctSeq = data.sequence;
-      // quarter note = 1 beat
-      // notes length = Math.pow(2, d.duration)
-      // beat length * (4 / note length)
-      DELAY = correctSeq.map(d =>
-        Math.floor(BEAT_LENGTH * (4 / 2 ** d.duration))
-      );
-      // console.log({ DELAY });
-      DURATION = d3.sum(DELAY);
     }
 
     function generatePiano() {
@@ -87,9 +61,9 @@ d3.selection.prototype.noteChart = function init(options) {
       const PIANO_HEIGHT = tooTall
         ? // if so, figure out the widest each key can be
           height / numKeys / WIDTH_TO_HEIGHT_RATIO
-        : // otherwise, scale the piano's height based on taking up 1/4 of the svg width
+        : //   otherwise  , scale the piano's height based on taking up 1/4 of the svg width
           width * 0.25;
-      // const PIANO_WIDTH = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO;
+      // const PIANO_WIDTH = PIANO_HEIGHT *   WIDTH_TO_HEIGHT_RATIO;
       const WIDTH_RATIO = 0.7;
       const HEIGHT_RATIO = 0.6;
       whiteWidth = PIANO_HEIGHT * WIDTH_TO_HEIGHT_RATIO; // Math.round(PIANO_WIDTH / whiteKeys);
@@ -142,94 +116,14 @@ d3.selection.prototype.noteChart = function init(options) {
 
     function isCorrect(note, index) {
       return (
-        note.midi === data.sequence[index].midi &&
-        note.duration === data.sequence[index].duration
+        note[0] === data.sequence[index].midi &&
+        note[1] === data.sequence[index].duration
       );
-    }
-
-    function setupNoteGroup(sequence, index) {
-      // add location data to played notes
-      const seqLoc = sequence.map(d => ({
-        midi: +d[0],
-        duration: +d[1],
-        coord: keyMap.get(+d[0]),
-      }));
-
-      // setup a group for each played sequence
-      const $gNotes = $vis
-        .select('.g-notes')
-        .append('g')
-        .attr('class', 'sequence')
-        .attr('data-order', index);
-
-      // add played notes to group
-      const $notes = $gNotes
-        .selectAll('.note')
-        .data(seqLoc)
-        .join(enter =>
-          enter
-            .append('rect')
-            .attr('class', 'note')
-            .attr('data-order', (d, i) => i)
-        )
-        .attr('x', width * 0.9)
-        .attr('y', d => d.coord.y.min)
-        .attr('width', d => scaleGuideBlock(1 / d.duration))
-        .attr('height', d => d.coord.y.max - d.coord.y.min)
-        .style('fill', d => scaleColor(d.midi))
-        .classed('is-correct', (d, i) => isCorrect(d, i));
-
-      // for each note, play it
-      $notes.each(playNote);
-    }
-
-    function playNote() {
-      // select the note
-      const note = d3.select(this);
-      const index = note.attr('data-order');
-      const thisDelay = d3.sum(DELAY.slice(0, index));
-
-      // animate it
-      note
-        .transition()
-        .duration(DURATION)
-        .delay(thisDelay)
-        .attr('x', scaleXGuide(index));
-    }
-
-    function moveNoteGroup(index) {
-      const $sequences = $gSeq.selectAll('.sequence');
-      const group = $sequences.filter(
-        (d, i, n) => d3.select(n[i]).attr('data-order') === index
-      );
-
-      const notes = $sequences.selectAll('.note');
-
-      finishedSeq.push(index);
-
-      notes
-        .transition()
-        .duration(200)
-        .attr('y', height * 0.5);
-
-      $sequences.attr('data-status', 'finished');
-
-      const $finished = $gSeq.selectAll('[data-status="finished"]').nodes();
-      $finished.forEach((g, index) => {
-        const played = d3.select(g);
-        const slot = $finished.length - index;
-
-        played
-          .transition()
-          .duration(200)
-          .attr('transform', `translate(0, ${(whiteWidth + PADDING) * slot})`);
-      });
     }
 
     const Chart = {
       // called once at start
       init() {
-        findDuration();
         $svg = $chart.append('svg').attr('class', 'graphic__piano');
 
         // setup viz group
@@ -309,52 +203,124 @@ d3.selection.prototype.noteChart = function init(options) {
           ]);
 
         // append the sequence guides
-        $vis
-          .select('.g-guide')
-          .selectAll('.guide')
-          .data(guideData)
-          .join(enter => enter.append('rect').attr('class', 'guide'))
-          .attr('x', (d, i) => scaleXGuide(i))
-          .attr('y', d => d.coord.y.min)
-          .attr('width', d => scaleGuideBlock(1 / d.duration))
-          .attr('height', d => d.coord.y.max - d.coord.y.min)
-          .style('stroke', d => scaleColor(d.midi));
-
-        // if results have already been generated
-        if (data.result) {
-          const results = data.result.recent;
-          let seqPromise = Promise.resolve();
-          const interval = DURATION * 2;
-          // console.log({ data, results });
-
-          const filteredResults = results.filter(d => d.length > 1);
-
-          filteredResults.forEach((d, i) => {
-            seqPromise = seqPromise
-              .then(() => {
-                setupNoteGroup(d, i);
-                return new Promise(resolve => {
-                  setTimeout(resolve, interval);
-                });
-              })
-              .then(() => {
-                moveNoteGroup(i);
-
-                return new Promise(resolve => {
-                  setTimeout(resolve, interval);
-                });
-              });
-          });
-
-          seqPromise.then(() => {
-            // console.log('loop finished');
-          });
-          // filteredResults.forEach((d, i) => {
-          //     setupNoteGroup(d)
-          // });
+        if (thisChart !== 'two') {
+          $vis
+            .select('.g-guide')
+            .selectAll('.guide')
+            .data(guideData)
+            .join(enter => enter.append('rect').attr('class', 'guide'))
+            .attr('x', (d, i) => scaleXGuide(i))
+            .attr('y', d => d.coord.y.min)
+            .attr('width', d => scaleGuideBlock(1 / d.duration))
+            .attr('height', d => whiteWidth)
+            .style('stroke', d => scaleColor(d.midi));
         }
 
         return Chart;
+      },
+      pressKey({ key }) {
+        key
+          .transition()
+          .duration(100)
+          .style('fill', d => scaleColor(d.midi));
+
+        const keyData = key.data();
+        const { coord, midi } = keyData[0];
+
+        const $note = $gSeq.append('rect').attr('class', 'note');
+
+        $note
+          .attr('x', coord.x.min)
+          .attr('y', coord.y.min)
+          .attr('width', scaleGuideBlock(1 / 3))
+          .attr('height', whiteWidth)
+          .style('fill', scaleColor(midi))
+          .transition()
+          .duration(1000)
+          .attr('x', -width);
+      },
+      releaseKey({ key }) {
+        key
+          .transition()
+          .duration(100)
+          .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+      },
+      update({ sequenceProgress, jump }) {
+        const ANIMATION_DURATION = jump ? 0 : 50;
+        const $group = $vis.select('.g-notes');
+
+        const $seq = $group
+          .selectAll('.sequence')
+          .data(sequenceProgress)
+          .join(enter =>
+            enter
+              .append('g')
+              .attr('class', 'sequence')
+              .attr('data-order', (d, i) => i)
+          );
+
+        $seq
+          .selectAll('.note')
+          .data(d => d)
+          .join(enter => {
+            const $playedNote = enter
+              .append('rect')
+              .attr('class', 'note')
+              .attr('x', width * 0.9)
+              .attr('y', d => {
+                const coord = keyMap.get(+d[0]);
+                return coord.y.min;
+              })
+              .attr('width', d => scaleGuideBlock(1 / d[1]))
+              .attr('height', whiteWidth)
+              .style('fill', d => scaleColor(d[0]))
+              .classed('is-correct', (d, i) => isCorrect(d, i));
+
+            $playedNote
+              .transition()
+              .duration(ANIMATION_DURATION)
+              .attr('x', (d, i) => scaleXGuide(i));
+          });
+      },
+      moveSequence({ index, jump }) {
+        const seqIndex = index;
+        const ANIMATION_DURATION = jump ? 0 : 200;
+        const ANIMATION_DELAY = jump ? 0 : 100;
+
+        // set the just finished sequence class to finished
+        const $justFinished = $vis
+          .selectAll('.sequence')
+          .filter((d, i, n) => {
+            const order = d3.select(n[i]).attr('data-order');
+            return order === `${seqIndex}`;
+          })
+          .classed('finished', true);
+
+        $justFinished
+          .selectAll('.note')
+          .transition()
+          .delay(ANIMATION_DELAY)
+          .duration(ANIMATION_DURATION)
+          .attr('y', height * 0.5);
+
+        const $allFinished = $vis.selectAll('.finished').nodes();
+        $allFinished.forEach((g, index) => {
+          const played = d3.select(g);
+          // const staticPlayed = played.attr('data-static');
+          const slot = $allFinished.length - index;
+
+          played
+            .transition()
+            .duration(ANIMATION_DURATION)
+            .attr(
+              'transform',
+              `translate(0, ${(whiteWidth + PADDING) * slot})`
+            );
+        });
+      },
+      // pause animations?
+      pause() {
+        console.log('paused');
       },
       // get / set data
       data(val) {

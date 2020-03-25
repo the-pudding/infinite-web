@@ -3,7 +3,6 @@ import debounce from 'lodash.debounce';
 import isMobile from './utils/is-mobile';
 import linkFix from './utils/link-fix';
 import graphic from './graphic';
-import piano from './piano';
 import probability from './probability';
 import clock from './clock';
 import results from './results';
@@ -20,7 +19,6 @@ function resize() {
   if (previousWidth !== width) {
     previousWidth = width;
     graphic.resize();
-    piano.resize();
   }
 }
 
@@ -39,7 +37,6 @@ function setupStickyHeader() {
 
 function begin(data) {
   graphic.init();
-  piano.init();
   probability.init();
   results.init(data);
   clock.init(data);
