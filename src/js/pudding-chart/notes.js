@@ -386,7 +386,20 @@ d3.selection.prototype.noteChart = function init(options) {
           .duration(100)
           .style('fill', d => scaleColor(d.midi));
 
+        const keyData = key.data();
+        const { coord, midi } = keyData[0];
+
         const $note = $gSeq.append('rect').attr('class', 'note');
+
+        $note
+          .attr('x', coord.x.min)
+          .attr('y', coord.y.min)
+          .attr('width', scaleGuideBlock(1 / 3))
+          .attr('height', whiteWidth)
+          .style('fill', scaleColor(midi))
+          .transition()
+          .duration(1000)
+          .attr('x', -width);
       },
       releaseKey({ key }) {
         key
