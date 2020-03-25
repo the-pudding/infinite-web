@@ -127,11 +127,11 @@ d3.selection.prototype.noteChart = function init(options) {
         // setup viz group
         $vis = $svg.append('g').attr('class', 'g-vis');
 
-        // setup group for guide
-        $vis.append('g').attr('class', 'g-guide');
-
         // setup group for notes
         $gSeq = $vis.append('g').attr('class', 'g-notes');
+
+        // setup group for guide
+        $vis.append('g').attr('class', 'g-guide');
 
         // setup group for piano
         $vis.append('g').attr('class', 'g-piano');
@@ -251,7 +251,11 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('x', -width);
       },
       clear() {
-        $gSeq.selectAll('.sequence').exit();
+        const $allSeq = $vis.selectAll('.sequence').remove();
+
+        console.log({ $allSeq, $gSeq });
+        // .exit()
+        // .remove();
       },
       update({ sequenceProgress, jump }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
