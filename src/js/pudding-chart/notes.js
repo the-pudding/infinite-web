@@ -56,11 +56,12 @@ d3.selection.prototype.noteChart = function init(options) {
 
       const WIDTH_TO_HEIGHT_RATIO = 0.2;
       const idealWidth = width * 0.25 * WIDTH_TO_HEIGHT_RATIO;
+      const HEIGHT_CUTOFF = height * 0.5;
       // does the ideal width make the piano too tall?
-      const tooTall = idealWidth * numKeys > height;
+      const tooTall = idealWidth * numKeys > HEIGHT_CUTOFF;
       const PIANO_HEIGHT = tooTall
         ? // if so, figure out the widest each key can be
-          height / numKeys / WIDTH_TO_HEIGHT_RATIO
+          HEIGHT_CUTOFF / numKeys / WIDTH_TO_HEIGHT_RATIO
         : //   otherwise  , scale the piano's height based on taking up 1/4 of the svg width
           width * 0.25;
       // const PIANO_WIDTH = PIANO_HEIGHT *   WIDTH_TO_HEIGHT_RATIO;
@@ -79,14 +80,15 @@ d3.selection.prototype.noteChart = function init(options) {
       // return an updated array with key coordinates
       return keys.map(d => {
         // if the keys are sharp/black offset them
-        const offset = d.sharp === false ? 0 : -blackWidth / 2;
+        const offset = d.sharp === false ? 0 : blackWidth;
 
         return {
           ...d,
           coord: {
             y: {
-              min: whiteWidth * numLowerWhites(d.midi) + offset,
+              min: HEIGHT_CUTOFF - whiteWidth * numLowerWhites(d.midi) + offset,
               max:
+                HEIGHT_CUTOFF -
                 whiteWidth * numLowerWhites(d.midi) +
                 offset +
                 (d.sharp === false ? whiteWidth : blackWidth),
@@ -175,9 +177,11 @@ d3.selection.prototype.noteChart = function init(options) {
           .join(enter =>
             enter
               .append('rect')
-              .attr('class', d =>
-                d.sharp === true ? `key key__black` : `key key__white`
-              )
+              .attr('class', d => {
+                if (d.note === 'rest') return `key key__rest`;
+                if (d.sharp === true) return `key key__black`;
+                return `key key__white`;
+              })
               .attr('data-midi', d => d.midi)
               .classed('active', d => activeKeys.includes(d.midi))
           )
@@ -185,6 +189,19 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('y', d => d.coord.y.min)
           .attr('width', d => d.coord.x.max - d.coord.x.min)
           .attr('height', d => d.coord.y.max - d.coord.y.min);
+
+        const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
+        console.log({ restCoord });
+        // add text to rest key
+        $vis
+          .select('.g-piano')
+          .append('text')
+          .text('rest')
+          .attr(
+            'transform',
+            `translate(${restCoord.x.min}, ${restCoord.y.min + 5})`
+          )
+          .attr('alignment-baseline', 'hanging');
 
         // raise black keys on top of white ones in DOM
         $vis.selectAll('.key__black').raise();

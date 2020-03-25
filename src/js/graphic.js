@@ -47,6 +47,8 @@ function findKeys({ range, crosswalk }) {
   );
 
   const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
+  keys.push({ midi: 0, note: 'rest', sharp: false });
+  console.log({ keys });
 
   return keys;
 }
