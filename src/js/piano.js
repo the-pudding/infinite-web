@@ -127,7 +127,7 @@ function setupEnterView() {
       // pause other charts
       Object.keys(charts).map(d => {
         const val = charts[d];
-        // val.pause();
+        Audio.stop();
       });
 
       // select the currently entered chart and update/play it
