@@ -208,8 +208,8 @@ d3.selection.prototype.noteChart = function init(options) {
         scaleGuideBlock
           .range([whiteWidth, whiteWidth * 2])
           .domain([
-            1 / Math.max(...uniqueDurations),
-            1 / Math.min(...uniqueDurations),
+            2 ** Math.max(...uniqueDurations),
+            2 ** Math.min(...uniqueDurations),
           ]);
 
         // append the sequence guides
@@ -221,7 +221,7 @@ d3.selection.prototype.noteChart = function init(options) {
             .join(enter => enter.append('rect').attr('class', 'guide'))
             .attr('x', (d, i) => scaleXGuide(i))
             .attr('y', d => d.coord.y.min)
-            .attr('width', d => scaleGuideBlock(1 / d.duration))
+            .attr('width', d => scaleGuideBlock(2 ** d.duration))
             .attr('height', d => whiteWidth);
         }
 
@@ -244,7 +244,7 @@ d3.selection.prototype.noteChart = function init(options) {
         $note
           .attr('x', coord.x.min)
           .attr('y', coord.y.min)
-          .attr('width', scaleGuideBlock(1 / 3))
+          .attr('width', scaleGuideBlock(2 ** 3))
           .attr('height', whiteWidth)
           .transition()
           .duration(1000)
@@ -276,7 +276,7 @@ d3.selection.prototype.noteChart = function init(options) {
                 const coord = keyMap.get(+d[0]);
                 return coord.y.min;
               })
-              .attr('width', d => scaleGuideBlock(1 / d[1]))
+              .attr('width', d => scaleGuideBlock(2 ** d[1]))
               .attr('height', whiteWidth)
               .classed('is-correct', (d, i) => isCorrect(d, i));
 
