@@ -93,7 +93,7 @@ function init() {
       console.log({ data });
     })
     .then(() => {
-      piano.init(data);
+      piano.init({ levels: data, cw: crosswalk });
     })
     .catch(console.error);
 }

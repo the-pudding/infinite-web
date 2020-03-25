@@ -7,6 +7,7 @@ const $pianos = $article.selectAll('.figure__piano');
 const charts = {};
 
 let data = [];
+let crosswalk = [];
 
 function filterData(condition) {
   let specificData = null;
@@ -21,20 +22,13 @@ function filterData(condition) {
   return specificData;
 }
 
-function handleNewNote({ note, duration }) {
-  // tell chart to update with new note and duration
-}
-
 function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const sequences = thisData.result.recent.slice(0, maxSequences);
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
   const { tempo, sig } = thisData;
-  // [[[63, 3], [67, 3], [63, 3]],
-  //  [[63, 3], [67, 3], [63, 3]]]
-  // chart.setupSequences(sequences);
+
   const sequenceProgress = [];
 
-  // chart.update(sequenceProgress, jump: true);
   let seqIndex = 0;
 
   if (staticData.length) {
@@ -90,18 +84,27 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
           if (seqIndex < sequences.length)
             setTimeout(() => playNextSequence(), 500);
         }
-        // notesPlayed += 1;
-        // if (done with sequence) {
-        // seqIndex +=1;
-        // if (seqIndex < sequences.length)
-        //   // playNextSequence();
-        // }
-        // }
       },
     });
   };
 
   playNextSequence();
+}
+
+function makeKeysClickable() {
+  const $figure = d3.select(`[data-type='two']`);
+  const $piano = $figure.select('.g-piano');
+  const $activeKeys = $piano.selectAll('.active');
+
+  $activeKeys
+    .on('mousedown', function() {
+      const key = d3.select(this);
+      const midi = key.attr('data-midi');
+      const match = crosswalk.find(p => +p.midi === +midi);
+      const note = match ? `${match.note}${match.octave}` : null;
+      Audio.clickKey(note);
+    })
+    .on('mouseup', Audio.keyUp);
 }
 
 function setupEnterView() {
@@ -133,7 +136,7 @@ function setupEnterView() {
           playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 4] });
         else
           playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
-      }
+      } else makeKeysClickable();
     },
     offset: 0.25,
     once: true,
@@ -150,14 +153,9 @@ function setupCharts() {
   charts[condition] = chart;
 }
 
-function importCharts() {
-  return new Promise((resolve, reject) => {
-    resolve({ charts });
-  });
-}
-
-function init(levels) {
+function init({ levels, cw }) {
   data = levels;
+  crosswalk = cw;
   // scroll triggers
   $pianos.each(setupCharts);
   setupEnterView();
@@ -167,4 +165,4 @@ function resize() {
   charts.forEach(chart => chart.resize().render());
 }
 
-export default { init, resize, importCharts };
+export default { init, resize };

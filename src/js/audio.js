@@ -9,9 +9,24 @@ const sampler = new Tone.Sampler(samples, {
   baseUrl: 'assets/notes/',
 }).toMaster();
 
+// setup synth for clickable keyboard
+const synth = new Tone.Synth();
+// set the tone to sine
+synth.oscillator.type = 'sine';
+// connect to master output
+synth.toMaster();
+
 function stop() {
   // make sure there is a transport to stop
   Tone.Transport.stop();
+}
+
+function clickKey(note) {
+  synth.triggerAttack(note);
+}
+
+function keyUp() {
+  synth.triggerRelease();
 }
 
 function play({ sequence, tempo, sig, noteCallback }) {
@@ -30,4 +45,4 @@ function play({ sequence, tempo, sig, noteCallback }) {
   Tone.Transport.start();
 }
 
-export default { play, stop };
+export default { play, stop, clickKey, keyUp };
