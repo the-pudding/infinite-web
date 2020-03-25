@@ -36,25 +36,10 @@ d3.selection.prototype.noteChart = function init(options) {
     let whiteWidth = 0;
     const PADDING = 10;
 
-    // animation constants
-    let DURATION = 0;
-    let DELAY = 0;
-
-    // assuming 120 beats per minute (2 per second or 30 whole notes per minute)
-    // assuming 4/4 tempo
-    // 1 measure = 1 whole note
-    // 1 measure in 2 seconds
-    const BPM = data.tempo;
-    const minute = 60000;
-    const BEAT_LENGTH = Math.floor(minute / BPM);
-
-    // sequences that have already played
-    const finishedSeq = [];
-
     // scales
     const scaleXGuide = d3.scaleBand();
     const scaleGuideBlock = d3.scaleLinear();
-    const scaleY = null;
+
     const scaleColor = d3
       .scaleOrdinal()
       .range(['#ff5470', '#00ebc7', '#fde24f', '#A239CA', '#34A29E']);
@@ -63,18 +48,6 @@ d3.selection.prototype.noteChart = function init(options) {
 
     function findUnique(arr) {
       return [...new Set(arr)];
-    }
-
-    function findDuration() {
-      const correctSeq = data.sequence;
-      // quarter note = 1 beat
-      // notes length = Math.pow(2, d.duration)
-      // beat length * (4 / note length)
-      DELAY = correctSeq.map(d =>
-        Math.floor(BEAT_LENGTH * (4 / 2 ** d.duration))
-      );
-
-      DURATION = d3.sum(DELAY);
     }
 
     function generatePiano() {
@@ -148,109 +121,9 @@ d3.selection.prototype.noteChart = function init(options) {
       );
     }
 
-    function playNote() {
-      // select the note
-      const note = d3.select(this);
-      const index = note.attr('data-order');
-      const thisDelay = d3.sum(DELAY.slice(0, index));
-      const { midi } = note.data()[0];
-      const parentStatic = d3.select(this.parentNode).attr('data-static');
-
-      const key = $vis.selectAll(`[data-midi='${midi}']`);
-      key
-        .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
-        .transition()
-        .duration(0)
-        .delay(thisDelay)
-        .style('fill', scaleColor(midi))
-        .transition()
-        .duration(0)
-        .delay(DELAY[index])
-        .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
-
-      // animate it
-      note
-        .attr('data-static', parentStatic)
-        .transition()
-        .duration(parentStatic === 'true' ? 0 : DURATION)
-        .delay(parentStatic === 'true' ? 0 : thisDelay)
-        .attr('x', scaleXGuide(index));
-    }
-
-    function setupNoteGroup(sequence, index) {
-      const staticSeq = thisChart === 'results' && +index === 0;
-      // add location data to played notes
-      const seqLoc = sequence.map(d => ({
-        midi: +d[0],
-        duration: +d[1],
-        coord: keyMap.get(+d[0]),
-      }));
-
-      // setup a group for each played sequence
-      const $gNotes = $vis
-        .select('.g-notes')
-        .append('g')
-        .attr('class', 'sequence')
-        .attr('data-order', index)
-        .attr('data-static', staticSeq);
-
-      // add played notes to group
-      const $notes = $gNotes
-        .selectAll('.note')
-        .data(seqLoc)
-        .join(enter =>
-          enter
-            .append('rect')
-            .attr('class', 'note')
-            .attr('data-order', (d, i) => i)
-        )
-        .attr('x', width * 0.9)
-        .attr('y', d => d.coord.y.min)
-        .attr('width', d => scaleGuideBlock(1 / d.duration))
-        .attr('height', d => whiteWidth)
-        .style('fill', d => scaleColor(d.midi))
-        .classed('is-correct', (d, i) => isCorrect(d, i));
-
-      // for each note, play it
-      $notes.each(playNote);
-    }
-
-    function moveNoteGroup(index) {
-      const $sequences = $gSeq.selectAll('.sequence');
-      const group = $sequences.filter(
-        (d, i, n) => d3.select(n[i]).attr('data-order') === index.toString()
-      );
-
-      const groupStatic = group.attr('data-static');
-
-      const notes = group.selectAll('.note');
-
-      finishedSeq.push(index);
-
-      notes
-        .transition()
-        .duration(groupStatic === 'true' ? 0 : 200)
-        .attr('y', height * 0.5);
-
-      $sequences.attr('data-status', 'finished');
-
-      const $finished = $gSeq.selectAll('[data-status="finished"]').nodes();
-      $finished.forEach((g, index) => {
-        const played = d3.select(g);
-        const staticPlayed = played.attr('data-static');
-        const slot = $finished.length - index;
-
-        played
-          .transition()
-          .duration(staticPlayed === 'true' ? 0 : 200)
-          .attr('transform', `translate(0, ${(whiteWidth + PADDING) * slot})`);
-      });
-    }
-
     const Chart = {
       // called once at start
       init() {
-        findDuration();
         $svg = $chart.append('svg').attr('class', 'graphic__piano');
 
         // setup viz group
@@ -343,44 +216,9 @@ d3.selection.prototype.noteChart = function init(options) {
             .style('stroke', d => scaleColor(d.midi));
         }
 
-        // if (thisChart === 'two') {
-        //   // make keys pressable
-        //   const keys = $vis.selectAll('.active');
-        //   keys.on('click', function() {
-        //     const key = d3.select(this);
-        //     key
-        //       .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
-        //       .transition()
-        //       .duration(0)
-        //       .delay(0)
-        //       .style('fill', d => scaleColor(d.midi))
-        //       .transition()
-        //       .duration(0)
-        //       .delay(100)
-        //       .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
-
-        //     const keyData = key.data();
-        //     const thisKeyCoord = keyData[0].coord;
-        //     const thisMidi = keyData[0].midi;
-
-        //     const note = $gSeq.append('rect').attr('class', 'note');
-
-        //     note
-        //       .attr('x', thisKeyCoord.x.min)
-        //       .attr('y', thisKeyCoord.y.min)
-        //       .attr('width', scaleGuideBlock(1 / 3))
-        //       .attr('height', whiteWidth)
-        //       .style('fill', scaleColor(thisMidi))
-        //       .transition()
-        //       .duration(1000)
-        //       .attr('x', -width);
-        //   });
-        // }
-
         return Chart;
       },
       pressKey({ key }) {
-        console.log({ key });
         key
           .transition()
           .duration(100)

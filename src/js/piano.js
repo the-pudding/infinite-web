@@ -15,9 +15,17 @@ function filterData(condition) {
   const setupPianos = ['two', 'animated', 'results', 'success'];
   if (setupPianos.includes(condition)) {
     [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5 I');
-  } else if (condition === 'Meryl')
+  } else if (condition === 'Meryl') {
     [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5  II');
-  else [specificData] = data.levels.filter(d => d.title === 'Ice Ice Baby');
+  } else {
+    // find which songs already have results
+    const hasResults = data.levels.filter(d => d.result);
+
+    // keep last one (presumably the one still running)
+    const inProgress = hasResults.pop();
+
+    specificData = inProgress;
+  }
 
   return specificData;
 }
