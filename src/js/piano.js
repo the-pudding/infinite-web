@@ -103,8 +103,13 @@ function makeKeysClickable() {
       const match = crosswalk.find(p => +p.midi === +midi);
       const note = match ? `${match.note}${match.octave}` : null;
       Audio.clickKey(note);
+      charts.two.pressKey({ key });
     })
-    .on('mouseup', Audio.keyUp);
+    .on('mouseup', function() {
+      const key = d3.select(this);
+      Audio.keyUp();
+      charts.two.releaseKey({ key });
+    });
 }
 
 function setupEnterView() {

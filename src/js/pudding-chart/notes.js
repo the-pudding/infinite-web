@@ -343,41 +343,56 @@ d3.selection.prototype.noteChart = function init(options) {
             .style('stroke', d => scaleColor(d.midi));
         }
 
-        if (thisChart === 'two') {
-          // make keys pressable
-          const keys = $vis.selectAll('.active');
-          keys.on('click', function() {
-            const key = d3.select(this);
-            key
-              .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
-              .transition()
-              .duration(0)
-              .delay(0)
-              .style('fill', d => scaleColor(d.midi))
-              .transition()
-              .duration(0)
-              .delay(100)
-              .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+        // if (thisChart === 'two') {
+        //   // make keys pressable
+        //   const keys = $vis.selectAll('.active');
+        //   keys.on('click', function() {
+        //     const key = d3.select(this);
+        //     key
+        //       .style('fill', d => (d.sharp === true ? '#000' : '#fff'))
+        //       .transition()
+        //       .duration(0)
+        //       .delay(0)
+        //       .style('fill', d => scaleColor(d.midi))
+        //       .transition()
+        //       .duration(0)
+        //       .delay(100)
+        //       .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
 
-            const keyData = key.data();
-            const thisKeyCoord = keyData[0].coord;
-            const thisMidi = keyData[0].midi;
+        //     const keyData = key.data();
+        //     const thisKeyCoord = keyData[0].coord;
+        //     const thisMidi = keyData[0].midi;
 
-            const note = $gSeq.append('rect').attr('class', 'note');
+        //     const note = $gSeq.append('rect').attr('class', 'note');
 
-            note
-              .attr('x', thisKeyCoord.x.min)
-              .attr('y', thisKeyCoord.y.min)
-              .attr('width', scaleGuideBlock(1 / 3))
-              .attr('height', whiteWidth)
-              .style('fill', scaleColor(thisMidi))
-              .transition()
-              .duration(1000)
-              .attr('x', -width);
-          });
-        }
+        //     note
+        //       .attr('x', thisKeyCoord.x.min)
+        //       .attr('y', thisKeyCoord.y.min)
+        //       .attr('width', scaleGuideBlock(1 / 3))
+        //       .attr('height', whiteWidth)
+        //       .style('fill', scaleColor(thisMidi))
+        //       .transition()
+        //       .duration(1000)
+        //       .attr('x', -width);
+        //   });
+        // }
 
         return Chart;
+      },
+      pressKey({ key }) {
+        console.log({ key });
+        key
+          .transition()
+          .duration(100)
+          .style('fill', d => scaleColor(d.midi));
+
+        const $note = $gSeq.append('rect').attr('class', 'note');
+      },
+      releaseKey({ key }) {
+        key
+          .transition()
+          .duration(100)
+          .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
       },
       update({ sequenceProgress, jump }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
