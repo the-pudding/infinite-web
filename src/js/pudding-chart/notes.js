@@ -40,10 +40,6 @@ d3.selection.prototype.noteChart = function init(options) {
     const scaleXGuide = d3.scaleBand();
     const scaleGuideBlock = d3.scaleLinear();
 
-    const scaleColor = d3
-      .scaleOrdinal()
-      .range(['#ff5470', '#00ebc7', '#fde24f', '#A239CA', '#34A29E']);
-
     // helper functions
 
     function findUnique(arr) {
@@ -162,9 +158,6 @@ d3.selection.prototype.noteChart = function init(options) {
         // find which keys are used in current sequence
         const activeKeys = findUnique(data.sequence.map(d => d.midi));
 
-        // set color scale
-        scaleColor.domain(activeKeys);
-
         // create a key map
         const keyCoord = guideData.map(d => [d.midi, d.coord]);
         keyMap = new Map(keyCoord);
@@ -229,8 +222,7 @@ d3.selection.prototype.noteChart = function init(options) {
             .attr('x', (d, i) => scaleXGuide(i))
             .attr('y', d => d.coord.y.min)
             .attr('width', d => scaleGuideBlock(1 / d.duration))
-            .attr('height', d => whiteWidth)
-            .style('stroke', d => scaleColor(d.midi));
+            .attr('height', d => whiteWidth);
         }
 
         return Chart;
@@ -239,7 +231,7 @@ d3.selection.prototype.noteChart = function init(options) {
         key
           .transition()
           .duration(100)
-          .style('fill', d => scaleColor(d.midi))
+          .style('fill', d => 'red')
           .transition()
           .duration(100)
           .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
@@ -254,7 +246,6 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('y', coord.y.min)
           .attr('width', scaleGuideBlock(1 / 3))
           .attr('height', whiteWidth)
-          .style('fill', scaleColor(midi))
           .transition()
           .duration(1000)
           .attr('x', -width);
@@ -287,7 +278,6 @@ d3.selection.prototype.noteChart = function init(options) {
               })
               .attr('width', d => scaleGuideBlock(1 / d[1]))
               .attr('height', whiteWidth)
-              .style('fill', d => scaleColor(d[0]))
               .classed('is-correct', (d, i) => isCorrect(d, i));
 
             $playedNote
