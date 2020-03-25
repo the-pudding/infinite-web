@@ -250,6 +250,9 @@ d3.selection.prototype.noteChart = function init(options) {
           .duration(1000)
           .attr('x', -width);
       },
+      clear() {
+        $gSeq.selectAll('.sequence').exit();
+      },
       update({ sequenceProgress, jump }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
         const $group = $vis.select('.g-notes');

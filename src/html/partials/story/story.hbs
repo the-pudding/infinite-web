@@ -1,27 +1,29 @@
 <article>
 	{{#each doc.content}}
-		{{#if text}}
-			<p>{{{text}}}</p>
-		{{/if}}
-		
-		{{#if graphic}}
-			<figure class='figure__{{graphic}}' data-type={{{type}}}></figure>
-		{{/if}}
+	{{#if text}}
+	<p>{{{text}}}</p>
+	{{/if}}
 
-		{{#if odds }}
-			{{> story/odds }}
-		{{/if}}
-		{{#if youtube}}
-			{{> story/youtube }}
-		{{/if}}
-		{{#if hamlet}}
-			{{> story/hamlet }}
-		{{/if}}
-		{{#if clock}}
-			{{> story/clock }}
-		{{/if}}
-		{{#if results}}
-			{{> story/results }}
-		{{/if}}
+	{{#if graphic}}
+	<figure class='figure__{{graphic}}' data-type={{{type}}}>
+		<button class='figure__restart' data-type={{{type}}}>Restart</button>
+	</figure>
+	{{/if}}
+
+	{{#if odds }}
+	{{> story/odds }}
+	{{/if}}
+	{{#if youtube}}
+	{{> story/youtube }}
+	{{/if}}
+	{{#if hamlet}}
+	{{> story/hamlet }}
+	{{/if}}
+	{{#if clock}}
+	{{> story/clock }}
+	{{/if}}
+	{{#if results}}
+	{{> story/results }}
+	{{/if}}
 	{{/each}}
 </article>
