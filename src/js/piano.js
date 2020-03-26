@@ -91,7 +91,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
           // if we haven't hit the last sequence, do this again
           if (seqIndex < sequences.length)
-            setTimeout(() => playNextSequence(), 500);
+            setTimeout(() => playNextSequence(), 1000);
         }
       },
     });
@@ -147,7 +147,7 @@ function setupEnterView() {
     enter(el, i) {
       // pause other charts
       Object.keys(charts).map(d => {
-        const val = charts[d];
+        // const val = charts[d];
         Audio.stop();
       });
 
@@ -156,7 +156,7 @@ function setupEnterView() {
 
       findChartSpecifics(condition);
     },
-    offset: 0.25,
+    offset: 0.6,
     once: true,
   });
 }
