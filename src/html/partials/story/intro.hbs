@@ -3,8 +3,11 @@
 		<a href='{{meta.author.url}}' target='_blank'><strong>{{meta.author.first}}</strong></a> and <a href='{{meta.author2.url}}' target='_blank'><strong>{{meta.author2.first}}</strong></a>.
 	</p>
 	<p class='intro__overline'>Audio is <span>off by default.</span></p>
-	<p class='intro__prompt'>
-		<button class='btn' data-audio='on'>Begin with Audio <img inline src='volume-2.svg'></button>
-		<button class='btn' data-audio='off'>Continue Muted <img inline src='volume-x.svg'></button>
-	</p>
+	<div class='intro__prompt'>
+		<p class='loading'>Loading...</p>
+		<div class='choices'>
+			<button class='btn' data-audio='on'>Begin with Audio <img inline src='volume-2.svg'></button>
+			<button class='btn' data-audio='off'>Continue Muted <img inline src='volume-x.svg'></button>
+		</div>
+	</div>
 </div>

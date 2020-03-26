@@ -7,9 +7,17 @@ mark
 	padding 0.25em 0.5em
 	background-color $highlight
 
+main.is-ready #intro
+	.choices
+		opacity 1
+
+	.loading
+		display none
+
 article
 	margin 0 auto
 	padding 1rem
+	padding-top 4rem
 
 	> *
 		max-width $column-width
@@ -40,6 +48,7 @@ figure
 	padding 1rem
 	background-color $off-white
 	font-family $mono
+	user-select none
 
 .instruction
 	margin 0

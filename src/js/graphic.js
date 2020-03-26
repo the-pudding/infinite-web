@@ -1,6 +1,5 @@
 /* global d3 */
 import jump from 'jump.js';
-import loadData from './load-data';
 import dirtyCrosswalk from './pianoData.json';
 import findUnique from './utils/unique';
 import piano from './piano';

@@ -37,13 +37,11 @@ function init({ levels }) {
   $tr.append('td').html(d => `${d.title} <span><em>${d.artist}</em></span>`);
   $tr.append('td').text((d, i) => `${i === 0 ? '1 in ' : ''}${format(d.odds)}`);
   $tr.append('td').text(d => (d.result ? format(d.result.attempts) : 'NA'));
-  $tr
-    .append('td')
-    .text((d, i) =>
-      d.result && d.result.done
-        ? `Finished ${getDate(d.result.end)}`
-        : `In ${d.estimate}`
-    );
+  $tr.append('td').text(d => {
+    if (d.result && d.result.done) return `Finished ${getDate(d.result.end)}`;
+    if (d.result) return d.estimate;
+    return `In ${d.estimate}`;
+  });
 }
 
 export default { init };

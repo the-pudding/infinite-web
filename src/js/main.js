@@ -10,6 +10,7 @@ import footer from './footer';
 import loadData from './load-data';
 
 const $body = d3.select('body');
+const $main = $body.select('main');
 let previousWidth = 0;
 
 function resize() {
@@ -40,8 +41,8 @@ function begin(data) {
   results.init(data);
   clock.init(data);
   probability.init();
-  // load footer stories
   footer.init();
+  $main.classed('is-ready', true);
 }
 function init() {
   // adds rel="noopener" to all target="_blank" links
