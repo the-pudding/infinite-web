@@ -245,18 +245,23 @@ d3.selection.prototype.noteChart = function init(options) {
 
         adjustFigureDimensions();
 
-        const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
+        const restExists = pianoData.filter(d => d.midi === '0');
 
-        // add text to rest key
-        $vis
-          .select('.g-piano')
-          .append('text')
-          .text('rest')
-          .attr(
-            'transform',
-            `translate(${restCoord.x.min}, ${restCoord.y.min + 5})`
-          )
-          .attr('alignment-baseline', 'hanging');
+        if (restExists.length) {
+          // if there's a rest key, add it and add text
+          const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
+
+          // add text to rest key
+          $vis
+            .select('.g-piano')
+            .append('text')
+            .text('rest')
+            .attr(
+              'transform',
+              `translate(${restCoord.x.min}, ${restCoord.y.min + 5})`
+            )
+            .attr('alignment-baseline', 'hanging');
+        }
 
         // raise black keys on top of white ones in DOM
         $vis.selectAll('.key__black').raise();
