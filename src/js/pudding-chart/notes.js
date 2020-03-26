@@ -40,6 +40,8 @@ d3.selection.prototype.noteChart = function init(options) {
     const scaleXGuide = d3.scaleBand();
     const scaleGuideBlock = d3.scaleLinear();
 
+    const KEY_COLOR = '#fde24f';
+
     // helper functions
 
     function findUnique(arr) {
@@ -231,7 +233,7 @@ d3.selection.prototype.noteChart = function init(options) {
         key
           .transition()
           .duration(100)
-          .style('fill', d => 'red')
+          .style('fill', KEY_COLOR)
           .transition()
           .duration(100)
           .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
@@ -291,6 +293,22 @@ d3.selection.prototype.noteChart = function init(options) {
               .transition()
               .duration(ANIMATION_DURATION)
               .attr('x', (d, i) => scaleXGuide(i));
+
+            // highlight played key
+            const noteData = $playedNote.data();
+            const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
+              const midi = +d3.select(n[i]).attr('data-midi');
+              const played = noteData[0][0];
+              return midi === played;
+            });
+
+            $playedKey
+              .transition()
+              .duration(100)
+              .style('fill', d => KEY_COLOR)
+              .transition()
+              .duration(100)
+              .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
           });
       },
       moveSequence({ index, jump }) {
