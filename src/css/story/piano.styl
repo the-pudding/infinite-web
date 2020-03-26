@@ -1,5 +1,6 @@
 .figure__piano
 	height 75vh
+	padding 0
 	&[data-type="two"]
 		button 
 			display none
@@ -9,14 +10,13 @@
 		stroke-width 1px
 
 		&__white
-			fill rgba($gray-light, 0.5)
+			fill $gray-light
 
 			&.active
 				fill rgba($white, 1)
 
 		&__black
-			fill rgba($gray, 0.5)
-
+			fill $gray
 			&.active
 				fill rgba($off-black, 1)
 		

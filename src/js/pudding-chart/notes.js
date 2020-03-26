@@ -41,6 +41,7 @@ d3.selection.prototype.noteChart = function init(options) {
     const scaleGuideBlock = d3.scaleLinear();
 
     const KEY_COLOR = '#fde24f';
+    const NOTE_COLOR = '#00ebc7';
 
     // helper functions
 
@@ -50,7 +51,8 @@ d3.selection.prototype.noteChart = function init(options) {
 
     function generatePiano() {
       const { keys } = data;
-      const numKeys = keys.length;
+      // count only white keys since black ones go on top
+      const numKeys = keys.filter(d => d.sharp === false).length;
 
       const WIDTH_TO_HEIGHT_RATIO = 0.2;
       const idealWidth = width * 0.25 * WIDTH_TO_HEIGHT_RATIO;
@@ -71,23 +73,22 @@ d3.selection.prototype.noteChart = function init(options) {
       whiteHeight = PIANO_HEIGHT;
       const blackHeight = PIANO_HEIGHT * HEIGHT_RATIO;
 
-      // how many white keys came before this key?
-      const numLowerWhites = midi =>
-        keys.filter(e => e.midi < midi && e.sharp === false).length;
+      // how many white keys come after this key?
+      const numUpperWhites = midi =>
+        keys.filter(e => e.midi > midi && e.sharp === false).length;
 
       // return an updated array with key coordinates
       return keys.map(d => {
         // if the keys are sharp/black offset them
-        const offset = d.sharp === false ? 0 : blackWidth;
+        const offset = d.sharp === false ? 0 : -blackWidth / 2;
 
         return {
           ...d,
           coord: {
             y: {
-              min: HEIGHT_CUTOFF - whiteWidth * numLowerWhites(d.midi) + offset,
+              min: whiteWidth * numUpperWhites(d.midi) + offset,
               max:
-                HEIGHT_CUTOFF -
-                whiteWidth * numLowerWhites(d.midi) +
+                whiteWidth * numUpperWhites(d.midi) +
                 offset +
                 (d.sharp === false ? whiteWidth : blackWidth),
             },
@@ -241,7 +242,10 @@ d3.selection.prototype.noteChart = function init(options) {
         const keyData = key.data();
         const { coord, midi } = keyData[0];
 
-        const $note = $gSeq.append('rect').attr('class', 'note');
+        const $note = $gSeq
+          .append('rect')
+          .attr('class', 'note')
+          .classed('is-correct', true);
 
         $note
           .attr('x', coord.x.min)
