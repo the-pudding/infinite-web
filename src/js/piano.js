@@ -4,6 +4,7 @@ import './pudding-chart/notes';
 
 const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
+const $buttons = $article.selectAll('.figure__restart');
 const charts = {};
 
 let data = [];
@@ -104,20 +105,40 @@ function makeKeysClickable() {
   const $piano = $figure.select('.g-piano');
   const $activeKeys = $piano.selectAll('.active');
 
-  $activeKeys
-    .on('mousedown', function() {
-      const key = d3.select(this);
-      const midi = key.attr('data-midi');
-      const match = crosswalk.find(p => +p.midi === +midi);
-      const note = match ? `${match.note}${match.octave}` : null;
-      Audio.clickKey(note);
-      charts.two.pressKey({ key });
-    })
-    .on('mouseup', function() {
-      const key = d3.select(this);
-      Audio.keyUp();
-      charts.two.releaseKey({ key });
-    });
+  $activeKeys.on('click', function() {
+    const key = d3.select(this);
+    const midi = key.attr('data-midi');
+    const match = crosswalk.find(p => +p.midi === +midi);
+    const note = match ? `${match.note}${match.octave}` : null;
+    Audio.clickKey(+midi);
+    charts.two.pressKey({ key });
+  });
+}
+
+function findChartSpecifics(condition) {
+  const rend = charts[condition];
+  const thisData = rend.data();
+  const maxSequences = condition === 'animated' ? 1 : thisData.result.attempts;
+
+  if (condition !== 'two') {
+    if (condition === 'results')
+      playChart({
+        chart: rend,
+        thisData,
+        maxSequences: 4,
+        staticSeq: [0, 1],
+      });
+    else if (condition === 'success')
+      playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 4] });
+    else if (condition === 'Meryl')
+      playChart({
+        chart: rend,
+        thisData,
+        maxSequences: 5,
+        staticSeq: [0, 0],
+      });
+    else playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
+  } else makeKeysClickable();
 }
 
 function setupEnterView() {
@@ -132,27 +153,21 @@ function setupEnterView() {
 
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
-      const rend = charts[condition];
-      const thisData = rend.data();
-      const maxSequences =
-        condition === 'animated' ? 1 : thisData.result.attempts;
 
-      if (condition !== 'two') {
-        if (condition === 'results')
-          playChart({
-            chart: rend,
-            thisData,
-            maxSequences: 4,
-            staticSeq: [0, 1],
-          });
-        else if (condition === 'success')
-          playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 4] });
-        else
-          playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
-      } else makeKeysClickable();
+      findChartSpecifics(condition);
     },
     offset: 0.25,
     once: true,
+  });
+}
+
+function setupRestartButtons() {
+  $buttons.on('click', function(d) {
+    const clicked = d3.select(this);
+    const type = clicked.attr('data-type');
+    const chart = charts[type];
+    chart.clear();
+    findChartSpecifics(type);
   });
 }
 
@@ -172,6 +187,7 @@ function init({ levels, cw }) {
   // scroll triggers
   $pianos.each(setupCharts);
   setupEnterView();
+  setupRestartButtons();
 }
 
 function resize() {

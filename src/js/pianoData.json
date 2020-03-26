@@ -1,5 +1,10 @@
 [
     {
+        "midi": 0,
+        "note": "rest",
+        "octave": 0
+    },
+    {
         "midi": 21,
         "note": "A",
         "octave": 0

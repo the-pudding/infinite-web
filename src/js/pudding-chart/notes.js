@@ -40,9 +40,7 @@ d3.selection.prototype.noteChart = function init(options) {
     const scaleXGuide = d3.scaleBand();
     const scaleGuideBlock = d3.scaleLinear();
 
-    const scaleColor = d3
-      .scaleOrdinal()
-      .range(['#ff5470', '#00ebc7', '#fde24f', '#A239CA', '#34A29E']);
+    const KEY_COLOR = '#fde24f';
 
     // helper functions
 
@@ -56,11 +54,12 @@ d3.selection.prototype.noteChart = function init(options) {
 
       const WIDTH_TO_HEIGHT_RATIO = 0.2;
       const idealWidth = width * 0.25 * WIDTH_TO_HEIGHT_RATIO;
+      const HEIGHT_CUTOFF = height * 0.5;
       // does the ideal width make the piano too tall?
-      const tooTall = idealWidth * numKeys > height;
+      const tooTall = idealWidth * numKeys > HEIGHT_CUTOFF;
       const PIANO_HEIGHT = tooTall
         ? // if so, figure out the widest each key can be
-          height / numKeys / WIDTH_TO_HEIGHT_RATIO
+          HEIGHT_CUTOFF / numKeys / WIDTH_TO_HEIGHT_RATIO
         : //   otherwise  , scale the piano's height based on taking up 1/4 of the svg width
           width * 0.25;
       // const PIANO_WIDTH = PIANO_HEIGHT *   WIDTH_TO_HEIGHT_RATIO;
@@ -79,14 +78,15 @@ d3.selection.prototype.noteChart = function init(options) {
       // return an updated array with key coordinates
       return keys.map(d => {
         // if the keys are sharp/black offset them
-        const offset = d.sharp === false ? 0 : -blackWidth / 2;
+        const offset = d.sharp === false ? 0 : blackWidth;
 
         return {
           ...d,
           coord: {
             y: {
-              min: whiteWidth * numLowerWhites(d.midi) + offset,
+              min: HEIGHT_CUTOFF - whiteWidth * numLowerWhites(d.midi) + offset,
               max:
+                HEIGHT_CUTOFF -
                 whiteWidth * numLowerWhites(d.midi) +
                 offset +
                 (d.sharp === false ? whiteWidth : blackWidth),
@@ -129,11 +129,11 @@ d3.selection.prototype.noteChart = function init(options) {
         // setup viz group
         $vis = $svg.append('g').attr('class', 'g-vis');
 
-        // setup group for guide
-        $vis.append('g').attr('class', 'g-guide');
-
         // setup group for notes
         $gSeq = $vis.append('g').attr('class', 'g-notes');
+
+        // setup group for guide
+        $vis.append('g').attr('class', 'g-guide');
 
         // setup group for piano
         $vis.append('g').attr('class', 'g-piano');
@@ -160,9 +160,6 @@ d3.selection.prototype.noteChart = function init(options) {
         // find which keys are used in current sequence
         const activeKeys = findUnique(data.sequence.map(d => d.midi));
 
-        // set color scale
-        scaleColor.domain(activeKeys);
-
         // create a key map
         const keyCoord = guideData.map(d => [d.midi, d.coord]);
         keyMap = new Map(keyCoord);
@@ -175,9 +172,11 @@ d3.selection.prototype.noteChart = function init(options) {
           .join(enter =>
             enter
               .append('rect')
-              .attr('class', d =>
-                d.sharp === true ? `key key__black` : `key key__white`
-              )
+              .attr('class', d => {
+                if (d.note === 'rest') return `key key__rest`;
+                if (d.sharp === true) return `key key__black`;
+                return `key key__white`;
+              })
               .attr('data-midi', d => d.midi)
               .classed('active', d => activeKeys.includes(d.midi))
           )
@@ -185,6 +184,19 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('y', d => d.coord.y.min)
           .attr('width', d => d.coord.x.max - d.coord.x.min)
           .attr('height', d => d.coord.y.max - d.coord.y.min);
+
+        const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
+
+        // add text to rest key
+        $vis
+          .select('.g-piano')
+          .append('text')
+          .text('rest')
+          .attr(
+            'transform',
+            `translate(${restCoord.x.min}, ${restCoord.y.min + 5})`
+          )
+          .attr('alignment-baseline', 'hanging');
 
         // raise black keys on top of white ones in DOM
         $vis.selectAll('.key__black').raise();
@@ -198,8 +210,8 @@ d3.selection.prototype.noteChart = function init(options) {
         scaleGuideBlock
           .range([whiteWidth, whiteWidth * 2])
           .domain([
-            1 / Math.max(...uniqueDurations),
-            1 / Math.min(...uniqueDurations),
+            2 ** Math.max(...uniqueDurations),
+            2 ** Math.min(...uniqueDurations),
           ]);
 
         // append the sequence guides
@@ -211,9 +223,8 @@ d3.selection.prototype.noteChart = function init(options) {
             .join(enter => enter.append('rect').attr('class', 'guide'))
             .attr('x', (d, i) => scaleXGuide(i))
             .attr('y', d => d.coord.y.min)
-            .attr('width', d => scaleGuideBlock(1 / d.duration))
-            .attr('height', d => whiteWidth)
-            .style('stroke', d => scaleColor(d.midi));
+            .attr('width', d => scaleGuideBlock(2 ** d.duration))
+            .attr('height', d => whiteWidth);
         }
 
         return Chart;
@@ -222,7 +233,10 @@ d3.selection.prototype.noteChart = function init(options) {
         key
           .transition()
           .duration(100)
-          .style('fill', d => scaleColor(d.midi));
+          .style('fill', KEY_COLOR)
+          .transition()
+          .duration(100)
+          .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
 
         const keyData = key.data();
         const { coord, midi } = keyData[0];
@@ -232,18 +246,18 @@ d3.selection.prototype.noteChart = function init(options) {
         $note
           .attr('x', coord.x.min)
           .attr('y', coord.y.min)
-          .attr('width', scaleGuideBlock(1 / 3))
+          .attr('width', scaleGuideBlock(2 ** 3))
           .attr('height', whiteWidth)
-          .style('fill', scaleColor(midi))
           .transition()
           .duration(1000)
           .attr('x', -width);
       },
-      releaseKey({ key }) {
-        key
-          .transition()
-          .duration(100)
-          .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+      clear() {
+        const $allSeq = $vis.selectAll('.sequence').remove();
+
+        console.log({ $allSeq, $gSeq });
+        // .exit()
+        // .remove();
       },
       update({ sequenceProgress, jump }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
@@ -271,15 +285,30 @@ d3.selection.prototype.noteChart = function init(options) {
                 const coord = keyMap.get(+d[0]);
                 return coord.y.min;
               })
-              .attr('width', d => scaleGuideBlock(1 / d[1]))
+              .attr('width', d => scaleGuideBlock(2 ** d[1]))
               .attr('height', whiteWidth)
-              .style('fill', d => scaleColor(d[0]))
               .classed('is-correct', (d, i) => isCorrect(d, i));
 
             $playedNote
               .transition()
               .duration(ANIMATION_DURATION)
               .attr('x', (d, i) => scaleXGuide(i));
+
+            // highlight played key
+            const noteData = $playedNote.data();
+            const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
+              const midi = +d3.select(n[i]).attr('data-midi');
+              const played = noteData[0][0];
+              return midi === played;
+            });
+
+            $playedKey
+              .transition()
+              .duration(100)
+              .style('fill', d => KEY_COLOR)
+              .transition()
+              .duration(100)
+              .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
           });
       },
       moveSequence({ index, jump }) {
