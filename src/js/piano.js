@@ -70,7 +70,6 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
       sig,
       noteCallback: val => {
         // this runs for every note played
-
         // find the next note that needs to be played
         const note = val[notesPlayed];
 
@@ -90,7 +89,6 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
           chart.moveSequence({ index: seqIndex, jump: false });
           // move onto the next sequence
           seqIndex += 1;
-          arrSeq = seqIndex > DOM_CUTOFF ? DOM_CUTOFF : seqIndex;
           // start back at 0
           notesPlayed = 0;
           // make sure that sequenceProgress never has more than 10 items in it

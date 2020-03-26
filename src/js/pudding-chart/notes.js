@@ -369,8 +369,9 @@ d3.selection.prototype.noteChart = function init(options) {
 
             group
               .append('text')
-              .text(d => d[0])
-              .attr('alignment-baseline', 'hanging');
+              .text(d => d[2])
+              .attr('alignment-baseline', 'middle')
+              .attr('transform', `translate(2, ${whiteWidth / 2})`);
 
             group
               .transition()
