@@ -3,6 +3,7 @@ import samples from './samples.json';
 import midiToNotation from './midi-to-notation';
 
 let part = new Tone.Part(() => {}, []);
+Tone.Master.mute = true;
 
 const sampler = new Tone.Sampler(samples, {
   release: 0.5,
@@ -16,7 +17,6 @@ function stop() {
 
 function mute(condition) {
   Tone.Master.mute = condition;
-  console.log({ condition });
 }
 
 function clickKey(midi) {

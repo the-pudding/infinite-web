@@ -2,8 +2,9 @@
 import jump from 'jump.js';
 import dirtyCrosswalk from './pianoData.json';
 import findUnique from './utils/unique';
-import piano from './piano';
+import Piano from './piano';
 import Audio from './audio';
+import volume2Svg from './volume2';
 
 const $intro = d3.select('#intro');
 const $header = d3.select('header');
@@ -11,7 +12,9 @@ const $header = d3.select('header');
 let cwMap = null;
 let data = [];
 
-function resize() {}
+function resize() {
+  Piano.resize();
+}
 
 function toggleAudio(dir) {
   const isOn = $header.select('.audio .on').classed('is-visible');
@@ -81,16 +84,23 @@ function cleanData({ raw, crosswalk }) {
   return cleaned;
 }
 
+function inlineAudio() {
+  const $audio = d3.select('.hidden-audio');
+  const $el = d3.select('.inline-audio');
+  const t = $el.text();
+  $el.html(`${t} ${volume2Svg}`);
+  $el.on('click', () => {
+    $audio.node().play();
+  });
+}
 function init(raw) {
   $intro.selectAll('button').on('click', handleIntro);
   d3.select('.audio').on('click', handleHeader);
-
-  // start muted
-  Audio.mute(true);
+  inlineAudio();
 
   const crosswalk = cleanCrosswalk(dirtyCrosswalk);
   data = cleanData({ raw, crosswalk });
-  piano.init({ levels: data, cw: crosswalk });
+  Piano.init({ levels: data, cw: crosswalk });
 }
 
 export default { init, resize };

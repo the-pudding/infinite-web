@@ -54,3 +54,23 @@ figure
 	margin 0
 	text-align center
 	font-size 0.75em
+
+.inline-audio
+	margin-right 0.25em
+	padding 0 0.25em
+	background $fg
+	color $bg
+	cursor pointer
+
+	svg
+		display inline-block
+		width 1em
+		height 1em
+		vertical-align middle
+		transform translateY(-0.1em)
+
+		path, polygon
+			stroke $bg
+
+.hidden-audio
+	display none
