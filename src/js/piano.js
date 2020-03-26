@@ -34,9 +34,9 @@ function filterData(condition) {
 function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const sequences = thisData.result.recent.slice(0, maxSequences);
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
+  // max number of sequences to keep in the DOM
+  const DOM_CUTOFF = 10;
   const { tempo, sig } = thisData;
-
-  console.log({ sequences, staticData });
 
   const sequenceProgress = [];
 
@@ -44,8 +44,8 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
   if (staticData.length) {
     seqIndex = staticData.length;
-    staticData.forEach(seq => {
-      sequenceProgress.push(seq);
+    staticData.forEach((seq, i) => {
+      sequenceProgress.push({ index: i, notes: seq });
     });
 
     chart.update({ sequenceProgress, jump: true });
@@ -61,8 +61,9 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
   let notesPlayed = 0;
 
   const playNextSequence = () => {
-    sequenceProgress.push([]);
+    sequenceProgress.push({ index: seqIndex, notes: [] });
     const sequence = sequences[seqIndex];
+
     Audio.play({
       sequence,
       tempo,
@@ -77,7 +78,8 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
         notesPlayed += 1;
 
         // add this note to the sequence progress array
-        sequenceProgress[seqIndex].push(note);
+        const thisSeq = sequenceProgress.filter(d => d.index === seqIndex);
+        thisSeq[0].notes.push(note);
 
         // send the new note data to be updated
         chart.update({ sequenceProgress, jump: false });
@@ -88,8 +90,12 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
           chart.moveSequence({ index: seqIndex, jump: false });
           // move onto the next sequence
           seqIndex += 1;
+          arrSeq = seqIndex > DOM_CUTOFF ? DOM_CUTOFF : seqIndex;
           // start back at 0
           notesPlayed = 0;
+          // make sure that sequenceProgress never has more than 10 items in it
+          const progressLength = sequenceProgress.length;
+          if (progressLength > DOM_CUTOFF) sequenceProgress.shift();
 
           // if we haven't hit the last sequence, do this again
           if (seqIndex < sequences.length)
@@ -133,7 +139,6 @@ function findChartSpecifics(condition) {
     else if (condition === 'success') {
       const totalAttempts = thisData.result.recent.length;
       const lastStatic = totalAttempts - 3;
-      console.log({ totalAttempts });
       playChart({
         chart: rend,
         thisData,

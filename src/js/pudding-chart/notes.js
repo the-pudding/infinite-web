@@ -333,17 +333,17 @@ d3.selection.prototype.noteChart = function init(options) {
 
         const $seq = $group
           .selectAll('.sequence')
-          .data(sequenceProgress)
+          .data(sequenceProgress, d => d.index)
           .join(enter =>
             enter
               .append('g')
               .attr('class', 'sequence')
-              .attr('data-order', (d, i) => i)
+              .attr('data-order', d => d.index)
           );
 
         const $noteGroup = $seq
           .selectAll('.g-note')
-          .data(d => d)
+          .data(d => d.notes)
           .join(enter => {
             const group = enter
               .append('g')
