@@ -36,6 +36,8 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
   const { tempo, sig } = thisData;
 
+  console.log({ sequences, staticData });
+
   const sequenceProgress = [];
 
   let seqIndex = 0;
@@ -128,9 +130,17 @@ function findChartSpecifics(condition) {
         maxSequences: 4,
         staticSeq: [0, 1],
       });
-    else if (condition === 'success')
-      playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 4] });
-    else if (condition === 'Meryl')
+    else if (condition === 'success') {
+      const totalAttempts = thisData.result.recent.length;
+      const lastStatic = totalAttempts - 3;
+      console.log({ totalAttempts });
+      playChart({
+        chart: rend,
+        thisData,
+        maxSequences,
+        staticSeq: [0, lastStatic],
+      });
+    } else if (condition === 'Meryl')
       playChart({
         chart: rend,
         thisData,

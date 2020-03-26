@@ -41,7 +41,6 @@ function findKeys({ range, crosswalk }) {
   const noZero = midisSorted.filter(d => d !== 0);
   const endMidis = d3.extent(noZero);
   const allMidis = d3.range(endMidis[0], endMidis[1] + 1);
-  console.log({ rest, midisSorted, noZero });
 
   // find all octaves represented
   const octaves = allMidis.map(d => cwMap.get(d)); // .filter(d => d);
