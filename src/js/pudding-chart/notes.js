@@ -318,14 +318,11 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('height', whiteWidth)
           .transition()
           .duration(1000)
+          .ease(d3.easeQuadOut)
           .attr('x', -width);
       },
       clear() {
-        const $allSeq = $vis.selectAll('.sequence').remove();
-
-        // console.log({ $allSeq, $gSeq });
-        // .exit()
-        // .remove();
+        $vis.selectAll('.sequence').remove();
       },
       update({ sequenceProgress, jump }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
@@ -358,11 +355,6 @@ d3.selection.prototype.noteChart = function init(options) {
               .attr('class', 'note')
               .attr('x', 0)
               .attr('y', 0)
-              // .attr('x', width * 0.9)
-              // .attr('y', d => {
-              //   const coord = keyMap.get(+d[0]);
-              //   return coord.y.min;
-              // })
               .attr('width', d => scaleGuideBlock(2 ** d[1]))
               .attr('height', whiteWidth)
               .classed('is-correct', (d, i) => isCorrect(d, i));
@@ -376,6 +368,7 @@ d3.selection.prototype.noteChart = function init(options) {
             group
               .transition()
               .duration(ANIMATION_DURATION)
+              .ease(d3.easeQuadOut)
               .attr('transform', (d, i) => {
                 const coord = keyMap.get(+d[0]);
                 return `translate(${scaleXGuide(i)}, ${coord.y.min})`;
@@ -420,6 +413,7 @@ d3.selection.prototype.noteChart = function init(options) {
           .transition()
           .delay(ANIMATION_DELAY)
           .duration(ANIMATION_DURATION)
+          .ease(d3.easeQuadOut)
           .attr(
             'transform',
             (d, i) => `translate(${scaleXGuide(i)}, ${keyboardHeight})`
