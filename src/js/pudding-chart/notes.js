@@ -26,8 +26,9 @@ d3.selection.prototype.noteChart = function init(options) {
     // dimensions
     let width = 0;
     let height = 0;
+    let pageHeight = 0;
     const MARGIN_TOP = 16;
-    const MARGIN_BOTTOM = 0;
+    const MARGIN_BOTTOM = 16;
     const MARGIN_LEFT = 16;
     const MARGIN_RIGHT = 16;
     // height of white keys
@@ -35,13 +36,14 @@ d3.selection.prototype.noteChart = function init(options) {
     // width of white keys
     let whiteWidth = 0;
     const PADDING = 10;
+    let keyboardHeight = 0;
+    let KEYBOARD_BOTTOM = 0;
 
     // scales
     const scaleXGuide = d3.scaleBand();
     const scaleGuideBlock = d3.scaleLinear();
 
     const KEY_COLOR = '#fde24f';
-    const NOTE_COLOR = '#00ebc7';
 
     // helper functions
 
@@ -49,14 +51,68 @@ d3.selection.prototype.noteChart = function init(options) {
       return [...new Set(arr)];
     }
 
+    function adjustFigureDimensions() {
+      keyboardHeight = Math.floor(
+        $vis
+          .select('.g-piano')
+          .node()
+          .getBoundingClientRect().height
+      );
+
+      const buttonHeight = $chart.select('button').node().offsetHeight;
+      console.log({ buttonHeight });
+
+      // padding between keyboard and results
+      KEYBOARD_BOTTOM = whiteWidth;
+
+      // determine how many results to show
+      let results = 0;
+      switch (thisChart) {
+        case 'two':
+          results = 0;
+          break;
+        case 'animated':
+          results = 1;
+          break;
+        case 'results':
+          results = 4;
+          break;
+        case 'success':
+          results = 5;
+          break;
+        case 'Meryl':
+          results = 5;
+          break;
+        default:
+          results = 10;
+      }
+      console.log({ thisChart, results });
+
+      const resultHeight = (whiteWidth + PADDING) * results;
+      console.log({ resultHeight, keyboardHeight });
+      const newHeight =
+        keyboardHeight +
+        resultHeight +
+        KEYBOARD_BOTTOM +
+        buttonHeight +
+        MARGIN_TOP +
+        MARGIN_BOTTOM;
+      $chart.style('height', `${newHeight}px`);
+      $svg.style('height', `${newHeight - MARGIN_TOP - MARGIN_BOTTOM}px`);
+      height = newHeight - MARGIN_TOP - MARGIN_BOTTOM;
+    }
+
     function generatePiano() {
       const { keys } = data;
       // count only white keys since black ones go on top
       const numKeys = keys.filter(d => d.sharp === false).length;
 
+      // the piano should never exceed half the height of the page
+      const HEIGHT_CUTOFF = pageHeight * 0.5;
+
       const WIDTH_TO_HEIGHT_RATIO = 0.2;
       const idealWidth = width * 0.25 * WIDTH_TO_HEIGHT_RATIO;
-      const HEIGHT_CUTOFF = height * 0.5;
+
       // does the ideal width make the piano too tall?
       const tooTall = idealWidth * numKeys > HEIGHT_CUTOFF;
       const PIANO_HEIGHT = tooTall
@@ -142,6 +198,7 @@ d3.selection.prototype.noteChart = function init(options) {
       // on resize, update new dimensions
       resize() {
         // defaults to grabbing dimensions from container element
+        pageHeight = window.innerHeight;
         width = $chart.node().offsetWidth - MARGIN_LEFT - MARGIN_RIGHT;
         height = $chart.node().offsetHeight - MARGIN_TOP - MARGIN_BOTTOM;
         $svg
@@ -185,6 +242,8 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('y', d => d.coord.y.min)
           .attr('width', d => d.coord.x.max - d.coord.x.min)
           .attr('height', d => d.coord.y.max - d.coord.y.min);
+
+        adjustFigureDimensions();
 
         const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
 
@@ -334,7 +393,7 @@ d3.selection.prototype.noteChart = function init(options) {
           .transition()
           .delay(ANIMATION_DELAY)
           .duration(ANIMATION_DURATION)
-          .attr('y', height * 0.5);
+          .attr('y', keyboardHeight);
 
         const $allFinished = $vis.selectAll('.finished').nodes();
         $allFinished.forEach((g, index) => {
