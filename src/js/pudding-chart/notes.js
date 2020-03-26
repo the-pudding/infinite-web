@@ -22,7 +22,7 @@ d3.selection.prototype.noteChart = function init(options) {
     // data
     let data = $chart.datum();
     let keyMap = [];
-
+    if (thisChart === 'live') console.log({ data });
     // dimensions
     let width = 0;
     let height = 0;
@@ -336,34 +336,55 @@ d3.selection.prototype.noteChart = function init(options) {
               .attr('data-order', (d, i) => i)
           );
 
-        $seq
-          .selectAll('.note')
+        const $noteGroup = $seq
+          .selectAll('.g-note')
           .data(d => d)
           .join(enter => {
-            const $playedNote = enter
+            const group = enter
+              .append('g')
+              .attr('class', 'g-note')
+              .attr('transform', d => {
+                const coord = keyMap.get(+d[0]);
+                return `translate(${width * 0.9}, ${coord.y.min})`;
+              });
+
+            group
               .append('rect')
               .attr('class', 'note')
-              .attr('x', width * 0.9)
-              .attr('y', d => {
-                const coord = keyMap.get(+d[0]);
-                return coord.y.min;
-              })
+              .attr('x', 0)
+              .attr('y', 0)
+              // .attr('x', width * 0.9)
+              // .attr('y', d => {
+              //   const coord = keyMap.get(+d[0]);
+              //   return coord.y.min;
+              // })
               .attr('width', d => scaleGuideBlock(2 ** d[1]))
               .attr('height', whiteWidth)
               .classed('is-correct', (d, i) => isCorrect(d, i));
 
-            $playedNote
+            group
+              .append('text')
+              .text(d => d[0])
+              .attr('alignment-baseline', 'hanging');
+
+            group
               .transition()
               .duration(ANIMATION_DURATION)
-              .attr('x', (d, i) => scaleXGuide(i));
+              .attr('transform', (d, i) => {
+                const coord = keyMap.get(+d[0]);
+                return `translate(${scaleXGuide(i)}, ${coord.y.min})`;
+              });
 
             // highlight played key
-            const noteData = $playedNote.data();
+            const noteData = group.data();
+            console.log({ noteData, group });
             const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
               const midi = +d3.select(n[i]).attr('data-midi');
               const played = noteData[0][0];
               return midi === played;
             });
+
+            console.log({ $playedKey });
 
             $playedKey
               .transition()
@@ -389,11 +410,15 @@ d3.selection.prototype.noteChart = function init(options) {
           .classed('finished', true);
 
         $justFinished
-          .selectAll('.note')
+          .selectAll('.g-note')
           .transition()
           .delay(ANIMATION_DELAY)
           .duration(ANIMATION_DURATION)
-          .attr('y', keyboardHeight);
+          .attr(
+            'transform',
+            (d, i) => `translate(${scaleXGuide(i)}, ${keyboardHeight})`
+          );
+        // .attr('y', keyboardHeight);
 
         const $allFinished = $vis.selectAll('.finished').nodes();
         $allFinished.forEach((g, index) => {
