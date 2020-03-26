@@ -22,7 +22,7 @@ d3.selection.prototype.noteChart = function init(options) {
     // data
     let data = $chart.datum();
     let keyMap = [];
-    if (thisChart === 'live') console.log({ data });
+    // if (thisChart === 'live') console.log({ data });
     // dimensions
     let width = 0;
     let height = 0;
@@ -60,7 +60,7 @@ d3.selection.prototype.noteChart = function init(options) {
       );
 
       const buttonHeight = $chart.select('button').node().offsetHeight;
-      console.log({ buttonHeight });
+      // console.log({ buttonHeight });
 
       // padding between keyboard and results
       KEYBOARD_BOTTOM = whiteWidth;
@@ -86,10 +86,10 @@ d3.selection.prototype.noteChart = function init(options) {
         default:
           results = 10;
       }
-      console.log({ thisChart, results });
+      // console.log({ thisChart, results });
 
       const resultHeight = (whiteWidth + PADDING) * results;
-      console.log({ resultHeight, keyboardHeight });
+      // console.log({ resultHeight, keyboardHeight });
       const newHeight =
         keyboardHeight +
         resultHeight +
@@ -318,7 +318,7 @@ d3.selection.prototype.noteChart = function init(options) {
       clear() {
         const $allSeq = $vis.selectAll('.sequence').remove();
 
-        console.log({ $allSeq, $gSeq });
+        // console.log({ $allSeq, $gSeq });
         // .exit()
         // .remove();
       },
@@ -377,14 +377,14 @@ d3.selection.prototype.noteChart = function init(options) {
 
             // highlight played key
             const noteData = group.data();
-            console.log({ noteData, group });
+            // console.log({ noteData, group });
             const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
               const midi = +d3.select(n[i]).attr('data-midi');
               const played = noteData[0][0];
               return midi === played;
             });
 
-            console.log({ $playedKey });
+            // console.log({ $playedKey });
 
             $playedKey
               .transition()
@@ -437,7 +437,7 @@ d3.selection.prototype.noteChart = function init(options) {
       },
       // pause animations?
       pause() {
-        console.log('paused');
+        // console.log('paused');
       },
       // get / set data
       data(val) {

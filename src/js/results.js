@@ -33,7 +33,8 @@ function init({ levels }) {
     .selectAll('tr')
     .data(levels)
     .join('tr');
-  $tr.classed('is-success', d => d.result);
+  $tr.classed('is-success', d => d.result && d.result.done);
+  $tr.classed('is-progress', d => d.result && !d.result.done);
   $tr.append('td').html(d => `${d.title} <span><em>${d.artist}</em></span>`);
   $tr.append('td').text((d, i) => `${i === 0 ? '1 in ' : ''}${format(d.odds)}`);
   $tr.append('td').text(d => (d.result ? format(d.result.attempts) : 'NA'));

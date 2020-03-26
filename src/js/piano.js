@@ -105,7 +105,7 @@ function makeKeysClickable() {
   const $piano = $figure.select('.g-piano');
   const $activeKeys = $piano.selectAll('.active');
 
-  $activeKeys.on('click', function() {
+  $activeKeys.on('mousedown', function() {
     const key = d3.select(this);
     const midi = key.attr('data-midi');
     const match = crosswalk.find(p => +p.midi === +midi);

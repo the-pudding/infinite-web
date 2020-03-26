@@ -1,9 +1,13 @@
 .figure__piano
-	height 500px
 	padding 0
-	&[data-type="two"]
-		button 
+	height 500px
+
+	&[data-type='two']
+		button
 			display none
+
+		.key.active
+			cursor pointer
 
 	.key
 		stroke $off-black
@@ -13,16 +17,17 @@
 			fill $gray-light
 
 			&.active
-				fill rgba($white, 1)
+				fill $bg
 
 		&__black
 			fill $gray
+
 			&.active
-				fill rgba($off-black, 1)
-		
-		&__rest 
+				fill $fg
+
+		&__rest
 			fill transparent
-			stroke none
+			stroke-dasharray 2px 2px
 
 	.guide
 		stroke-width 1px
