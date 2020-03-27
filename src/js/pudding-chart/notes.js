@@ -253,7 +253,7 @@ d3.selection.prototype.noteChart = function init(options) {
           // if there's a rest key, add it and add text
           const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
 
-          console.log({ restCoord });
+          // console.log({ restCoord });
 
           // add text to rest key
           $vis
@@ -280,7 +280,7 @@ d3.selection.prototype.noteChart = function init(options) {
           .padding(0.1);
 
         const bandwidth = Math.round(scaleXGuide.bandwidth());
-        console.log({ bandwidth });
+        // console.log({ bandwidth });
 
         scaleGuideBlock
           .range([Math.min(whiteWidth, bandwidth / 2), bandwidth])

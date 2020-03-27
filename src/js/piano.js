@@ -1,5 +1,7 @@
+/* global d3 */
 import EnterView from 'enter-view';
 import Audio from './audio';
+import GenerateSequence from './generate-sequence';
 import './pudding-chart/notes';
 
 const $article = d3.select('article');
@@ -169,7 +171,7 @@ function setupEnterView() {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
 
-      if (condition !== 'tk') {
+      if (condition !== 'all') {
         // no enter view for select chart
         charts[condition].clear();
         findChartSpecifics(condition);
@@ -217,15 +219,16 @@ function setupDropdown(data) {
         .text(d => d)
     );
 
-  dd.on('change', function(d) {
+  dd.on('change', function() {
     const sel = d3.select(this).property('value');
 
-    // TODO generate the data
-    const [song] = data.levels.filter(d => d.title === sel);
+    const song = data.levels.find(d => d.title === sel);
+    const seq = GenerateSequence(song);
+    // TODO play ^ seq
 
-    charts.tk.clear();
+    charts.all.clear();
 
-    charts.tk
+    charts.all
       .data(song)
       .resize()
       .render();
