@@ -18,6 +18,7 @@ d3.selection.prototype.noteChart = function init(options) {
     const $axis = null;
     let $vis = null;
     const thisChart = $chart.attr('data-type');
+    const FONT_SIZE = 18;
 
     // data
     let data = $chart.datum();
@@ -246,11 +247,13 @@ d3.selection.prototype.noteChart = function init(options) {
 
         adjustFigureDimensions();
 
-        const restExists = pianoData.filter(d => d.midi === '0');
+        const restExists = pianoData.filter(d => d.midi === 0);
 
         if (restExists.length) {
           // if there's a rest key, add it and add text
           const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
+
+          console.log({ restCoord });
 
           // add text to rest key
           $vis
@@ -261,7 +264,8 @@ d3.selection.prototype.noteChart = function init(options) {
               'transform',
               `translate(${restCoord.x.min}, ${restCoord.y.min + 5})`
             )
-            .attr('alignment-baseline', 'hanging');
+            .attr('alignment-baseline', 'hanging')
+            .style('fontSize', whiteWidth >= 100 ? 18 : 14);
         }
 
         // raise black keys on top of white ones in DOM
