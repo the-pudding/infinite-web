@@ -272,9 +272,14 @@ d3.selection.prototype.noteChart = function init(options) {
         const uniqueDurations = findUnique(durations);
         scaleXGuide
           .range([0, width * 0.75])
-          .domain(d3.range(0, guideData.length));
+          .domain(d3.range(0, guideData.length))
+          .padding(0.1);
+
+        const bandwidth = Math.round(scaleXGuide.bandwidth());
+        console.log({ bandwidth });
+
         scaleGuideBlock
-          .range([whiteWidth, whiteWidth * 2])
+          .range([Math.min(whiteWidth, bandwidth / 2), bandwidth])
           .domain([
             2 ** Math.max(...uniqueDurations),
             2 ** Math.min(...uniqueDurations),
