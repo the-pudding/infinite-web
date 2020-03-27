@@ -22,7 +22,7 @@ d3.selection.prototype.noteChart = function init(options) {
     // data
     let data = $chart.datum();
     let keyMap = [];
-    // if (thisChart === 'live') console.log({ data });
+
     // dimensions
     let width = 0;
     let height = 0;
@@ -60,7 +60,6 @@ d3.selection.prototype.noteChart = function init(options) {
       );
 
       const buttonHeight = $chart.select('button').node().offsetHeight;
-      // console.log({ buttonHeight });
 
       // padding between keyboard and results
       KEYBOARD_BOTTOM = whiteWidth;
@@ -86,10 +85,8 @@ d3.selection.prototype.noteChart = function init(options) {
         default:
           results = 10;
       }
-      // console.log({ thisChart, results });
 
       const resultHeight = (whiteWidth + PADDING) * results;
-      // console.log({ resultHeight, keyboardHeight });
       const newHeight =
         keyboardHeight +
         resultHeight +
@@ -226,7 +223,11 @@ d3.selection.prototype.noteChart = function init(options) {
         $vis
           .select('.g-piano')
           .selectAll('.key')
-          .data(pianoData, d => d.midi)
+          .data(pianoData, d => {
+            const active = activeKeys.includes(d.midi);
+            const { midi } = d;
+            return `${active}-${midi}`;
+          })
           .join(enter =>
             enter
               .append('rect')
@@ -376,14 +377,12 @@ d3.selection.prototype.noteChart = function init(options) {
 
             // highlight played key
             const noteData = group.data();
-            // console.log({ noteData, group });
+
             const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
               const midi = +d3.select(n[i]).attr('data-midi');
               const played = noteData[0][0];
               return midi === played;
             });
-
-            // console.log({ $playedKey });
 
             $playedKey
               .transition()

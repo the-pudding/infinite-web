@@ -34,6 +34,7 @@ function filterData(condition) {
 function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const sequences = thisData.result.recent.slice(0, maxSequences);
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
+
   // max number of sequences to keep in the DOM
   const DOM_CUTOFF = 10;
   const { tempo, sig } = thisData;
@@ -44,6 +45,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
   if (staticData.length) {
     seqIndex = staticData.length;
+
     staticData.forEach((seq, i) => {
       sequenceProgress.push({ index: i, notes: seq });
     });
@@ -167,10 +169,19 @@ function setupEnterView() {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
 
-      findChartSpecifics(condition);
+      if (condition !== 'tk') {
+        // no enter view for select chart
+        charts[condition].clear();
+        findChartSpecifics(condition);
+      }
+    },
+    exit(el, i) {
+      Object.keys(charts).map(d => {
+        Audio.stop();
+      });
     },
     offset: 0.6,
-    once: true,
+    once: false,
   });
 }
 
@@ -194,6 +205,33 @@ function setupCharts() {
   charts[condition] = chart;
 }
 
+function setupDropdown(data) {
+  const dd = $article.select('.figure__dropdown');
+  const levels = data.levels.map(d => d.title);
+  dd.selectAll('option')
+    .data(levels)
+    .join(enter =>
+      enter
+        .append('option')
+        .attr('value', d => d)
+        .text(d => d)
+    );
+
+  dd.on('change', function(d) {
+    const sel = d3.select(this).property('value');
+
+    // TODO generate the data
+    const [song] = data.levels.filter(d => d.title === sel);
+
+    charts.tk.clear();
+
+    charts.tk
+      .data(song)
+      .resize()
+      .render();
+  });
+}
+
 function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
@@ -201,6 +239,7 @@ function init({ levels, cw }) {
   $pianos.each(setupCharts);
   setupEnterView();
   setupRestartButtons();
+  setupDropdown(data);
 }
 
 function resize() {
