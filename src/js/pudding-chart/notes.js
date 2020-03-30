@@ -226,9 +226,8 @@ d3.selection.prototype.noteChart = function init(options) {
           .select('.g-piano')
           .selectAll('.g-key')
           .data(pianoData, d => {
-            const active = activeKeys.includes(d.midi);
             const { midi } = d;
-            return `${active}-${midi}`;
+            return `${data.title}-${midi}`;
           })
           .join(enter =>
             enter.append('g').attr('class', d => {
@@ -254,12 +253,12 @@ d3.selection.prototype.noteChart = function init(options) {
                 return `key key__white`;
               })
               .attr('data-midi', d => d.midi)
-              .classed('active', d => activeKeys.includes(d.midi))
           )
           .attr('x', 0)
           .attr('y', 0)
           .attr('width', d => d.coord.x.max - d.coord.x.min)
-          .attr('height', d => d.coord.y.max - d.coord.y.min);
+          .attr('height', d => d.coord.y.max - d.coord.y.min)
+          .classed('active', d => activeKeys.includes(d.midi));
 
         adjustFigureDimensions();
 
@@ -294,7 +293,6 @@ d3.selection.prototype.noteChart = function init(options) {
           .padding(0.1);
 
         const bandwidth = Math.round(scaleXGuide.bandwidth());
-        // console.log({ bandwidth });
 
         scaleGuideBlock
           .range([Math.min(whiteWidth, bandwidth / 2), bandwidth])
