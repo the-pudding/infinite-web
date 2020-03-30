@@ -43,8 +43,6 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
   );
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
 
-  console.log({ chart, thisData, sequences, condition });
-
   // max number of sequences to keep in the DOM
   const DOM_CUTOFF = 10;
   const { tempo, sig } = thisData;
@@ -85,8 +83,6 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
         // find the next note that needs to be played
         const note = val[notesPlayed];
 
-        console.log({ note });
-
         // adjust the number of notes now played
         notesPlayed += 1;
 
@@ -106,7 +102,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
 
           // if this is the live chart, update the live chart count
           if (condition === 'live') liveChartCount += 1;
-          console.log({ liveChartCount });
+
           // start back at 0
           notesPlayed = 0;
           // make sure that sequenceProgress never has more than 10 items in it
