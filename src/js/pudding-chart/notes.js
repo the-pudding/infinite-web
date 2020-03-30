@@ -414,10 +414,10 @@ d3.selection.prototype.noteChart = function init(options) {
               .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
           });
       },
-      moveSequence({ index, jump }) {
+      moveSequence({ index, jump, duration }) {
         const seqIndex = index;
         const ANIMATION_DURATION = jump ? 0 : 200;
-        const ANIMATION_DELAY = jump ? 0 : 100;
+        const ANIMATION_DELAY = jump ? 0 : duration;
 
         // set the just finished sequence class to finished
         const $justFinished = $vis
@@ -448,6 +448,7 @@ d3.selection.prototype.noteChart = function init(options) {
 
           played
             .transition()
+            .delay(ANIMATION_DELAY)
             .duration(ANIMATION_DURATION)
             .attr(
               'transform',

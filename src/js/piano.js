@@ -37,6 +37,14 @@ function filterData(condition) {
   return specificData;
 }
 
+function findDuration(tempo, duration) {
+  // const BPM = data.tempo;
+  const minute = 60000;
+  const BEAT_LENGTH = Math.floor(minute / tempo);
+  const newDur = Math.floor(BEAT_LENGTH * (4 / 2 ** duration));
+  return newDur;
+}
+
 function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
   // add note data to played tones
   thisData.result.recent.forEach(seq => {
@@ -74,7 +82,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
     const prePrinted = d3.range(staticSeq[0], staticSeq[1]);
 
     prePrinted.forEach(seq => {
-      chart.moveSequence({ index: seq, jump: true });
+      chart.moveSequence({ index: seq, jump: true, duration: 0 });
     });
   }
 
@@ -107,8 +115,12 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
 
         // check if this was the last note of the sequence
         if (notesPlayed === val.length) {
-          // update the sequence
-          chart.moveSequence({ index: seqIndex, jump: false });
+          const finalDuration = findDuration(tempo, note[1]);
+          chart.moveSequence({
+            index: seqIndex,
+            jump: false,
+            duration: finalDuration,
+          });
           // move onto the next sequence
           seqIndex += 1;
 
@@ -123,7 +135,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
 
           // if we haven't hit the last sequence, do this again
           if (seqIndex < sequences.length)
-            setTimeout(() => playNextSequence(), 1000);
+            setTimeout(() => playNextSequence(), finalDuration + 500);
         }
       },
     });
