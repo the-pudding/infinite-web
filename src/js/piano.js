@@ -281,6 +281,14 @@ function setupDropdown(data) {
 
     const song = data.levels.find(d => d.title === sel);
     const seq = GenerateSequence(song);
+
+    const generatedData = {
+      title: song.title,
+      tempo: song.tempo,
+      sig: song.sig,
+      result: { recent: [seq] },
+    };
+
     // TODO play ^ seq
 
     charts.all.clear();
@@ -289,6 +297,14 @@ function setupDropdown(data) {
       .data(song)
       .resize()
       .render();
+
+    playChart({
+      chart: charts.all,
+      thisData: generatedData,
+      maxSequences: [0, 1],
+      staticSeq: [0, 0],
+      condition: 'all',
+    });
   });
 }
 
