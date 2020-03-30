@@ -12,6 +12,9 @@ const charts = {};
 let data = [];
 let crosswalk = [];
 
+// keep track of how far into this, the live chart has gone
+let liveChartCount = 0;
+
 function filterData(condition) {
   let specificData = null;
   // separate out phases for the first few steps which repeat the same piano
@@ -33,9 +36,14 @@ function filterData(condition) {
   return specificData;
 }
 
-function playChart({ chart, thisData, maxSequences, staticSeq }) {
-  const sequences = thisData.result.recent.slice(0, maxSequences);
+function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
+  const sequences = thisData.result.recent.slice(
+    maxSequences[0],
+    maxSequences[1]
+  );
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
+
+  console.log({ chart, thisData, sequences, condition });
 
   // max number of sequences to keep in the DOM
   const DOM_CUTOFF = 10;
@@ -95,6 +103,10 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
           chart.moveSequence({ index: seqIndex, jump: false });
           // move onto the next sequence
           seqIndex += 1;
+
+          // if this is the live chart, update the live chart count
+          if (condition === 'live') liveChartCount += 1;
+          console.log({ liveChartCount });
           // start back at 0
           notesPlayed = 0;
           // make sure that sequenceProgress never has more than 10 items in it
@@ -130,14 +142,16 @@ function makeKeysClickable() {
 function findChartSpecifics(condition) {
   const rend = charts[condition];
   const thisData = rend.data();
-  const maxSequences = condition === 'animated' ? 1 : thisData.result.attempts;
+  const maxSequences =
+    condition === 'animated' ? [0, 1] : [0, thisData.result.attempts];
 
   if (condition === 'results')
     playChart({
       chart: rend,
       thisData,
-      maxSequences: 4,
+      maxSequences: [0, 4],
       staticSeq: [0, 1],
+      condition,
     });
   else if (condition === 'success') {
     const totalAttempts = thisData.result.recent.length;
@@ -147,15 +161,36 @@ function findChartSpecifics(condition) {
       thisData,
       maxSequences,
       staticSeq: [0, lastStatic],
+      condition,
     });
   } else if (condition === 'Meryl')
     playChart({
       chart: rend,
       thisData,
-      maxSequences: 5,
+      maxSequences: [0, 5],
       staticSeq: [0, 0],
+      condition,
     });
-  else playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
+  else if (condition === 'live') {
+    const toCut = liveChartCount < 10;
+    const totalAttempts = thisData.result.recent.length;
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences: toCut
+        ? [0, totalAttempts]
+        : [liveChartCount - 10, totalAttempts],
+      staticSeq: [liveChartCount - 10, liveChartCount],
+      condition,
+    });
+  } else
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences,
+      staticSeq: [0, 0],
+      condition,
+    });
 }
 
 function setupEnterView() {
