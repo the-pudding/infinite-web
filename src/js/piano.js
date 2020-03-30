@@ -77,6 +77,8 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
         // find the next note that needs to be played
         const note = val[notesPlayed];
 
+        console.log({ note });
+
         // adjust the number of notes now played
         notesPlayed += 1;
 
@@ -130,32 +132,30 @@ function findChartSpecifics(condition) {
   const thisData = rend.data();
   const maxSequences = condition === 'animated' ? 1 : thisData.result.attempts;
 
-  if (condition !== 'two') {
-    if (condition === 'results')
-      playChart({
-        chart: rend,
-        thisData,
-        maxSequences: 4,
-        staticSeq: [0, 1],
-      });
-    else if (condition === 'success') {
-      const totalAttempts = thisData.result.recent.length;
-      const lastStatic = totalAttempts - 3;
-      playChart({
-        chart: rend,
-        thisData,
-        maxSequences,
-        staticSeq: [0, lastStatic],
-      });
-    } else if (condition === 'Meryl')
-      playChart({
-        chart: rend,
-        thisData,
-        maxSequences: 5,
-        staticSeq: [0, 0],
-      });
-    else playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
-  } else makeKeysClickable();
+  if (condition === 'results')
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences: 4,
+      staticSeq: [0, 1],
+    });
+  else if (condition === 'success') {
+    const totalAttempts = thisData.result.recent.length;
+    const lastStatic = totalAttempts - 3;
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences,
+      staticSeq: [0, lastStatic],
+    });
+  } else if (condition === 'Meryl')
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences: 5,
+      staticSeq: [0, 0],
+    });
+  else playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
 }
 
 function setupEnterView() {
@@ -171,7 +171,7 @@ function setupEnterView() {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
 
-      if (condition !== 'all') {
+      if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
         charts[condition].clear();
         findChartSpecifics(condition);
@@ -205,6 +205,8 @@ function setupCharts() {
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
   charts[condition] = chart;
+
+  if (condition === 'two') makeKeysClickable();
 }
 
 function setupDropdown(data) {
