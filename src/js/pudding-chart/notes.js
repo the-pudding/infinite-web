@@ -221,13 +221,32 @@ d3.selection.prototype.noteChart = function init(options) {
         keyMap = new Map(keyCoord);
 
         // append the piano
-        $vis
+        // first append a group for each key
+        const $keyGroup = $vis
           .select('.g-piano')
-          .selectAll('.key')
+          .selectAll('.g-key')
           .data(pianoData, d => {
             const active = activeKeys.includes(d.midi);
             const { midi } = d;
             return `${active}-${midi}`;
+          })
+          .join(enter =>
+            enter.append('g').attr('class', d => {
+              if (d.note === 'rest') return `g-key g-key__rest`;
+              if (d.sharp === true) return `g-key g-key__black`;
+              return `g-key g-key__white`;
+            })
+          )
+          .attr(
+            'transform',
+            d => `translate(${d.coord.x.min}, ${d.coord.y.min})`
+          );
+
+        $keyGroup
+          .selectAll('.key')
+          .data(d => {
+            console.log({ d });
+            return [d];
           })
           .join(enter =>
             enter
@@ -240,8 +259,8 @@ d3.selection.prototype.noteChart = function init(options) {
               .attr('data-midi', d => d.midi)
               .classed('active', d => activeKeys.includes(d.midi))
           )
-          .attr('x', d => d.coord.x.min)
-          .attr('y', d => d.coord.y.min)
+          .attr('x', 0)
+          .attr('y', 0)
           .attr('width', d => d.coord.x.max - d.coord.x.min)
           .attr('height', d => d.coord.y.max - d.coord.y.min);
 
@@ -257,19 +276,20 @@ d3.selection.prototype.noteChart = function init(options) {
 
           // add text to rest key
           $vis
-            .select('.g-piano')
+            .select('.g-key__rest')
             .append('text')
             .text('rest')
             .attr(
               'transform',
-              `translate(${restCoord.x.min}, ${restCoord.y.min + 5})`
+              `translate(${whiteHeight / 2}, ${whiteWidth / 2})`
             )
-            .attr('alignment-baseline', 'hanging')
+            .attr('alignment-baseline', 'middle')
+            .attr('text-anchor', 'middle')
             .style('fontSize', whiteWidth >= 100 ? 18 : 14);
         }
 
         // raise black keys on top of white ones in DOM
-        $vis.selectAll('.key__black').raise();
+        $vis.selectAll('.g-key__black').raise();
 
         // setup scales for sequence guides
         const durations = guideData.map(d => d.duration);
