@@ -11,6 +11,12 @@ const charts = {};
 
 let data = [];
 let crosswalk = [];
+let cwMapNote = [];
+
+let generatedData = {};
+
+// keep track of how far into this, the live chart has gone
+let liveChartCount = 0;
 
 function filterData(condition) {
   let specificData = null;
@@ -33,8 +39,29 @@ function filterData(condition) {
   return specificData;
 }
 
-function playChart({ chart, thisData, maxSequences, staticSeq }) {
-  const sequences = thisData.result.recent.slice(0, maxSequences);
+function findDuration(tempo, duration) {
+  // const BPM = data.tempo;
+  const minute = 60000;
+  const BEAT_LENGTH = Math.floor(minute / tempo);
+  const newDur = Math.floor(BEAT_LENGTH * (4 / 2 ** duration));
+  return newDur;
+}
+
+function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
+  // add note data to played tones
+  thisData.result.recent.forEach(seq => {
+    seq.forEach(tone => {
+      const note = cwMapNote.get(tone[0]);
+      tone.push(note);
+      return tone;
+    });
+    return seq;
+  });
+
+  const sequences = thisData.result.recent.slice(
+    maxSequences[0],
+    maxSequences[1]
+  );
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
 
   // max number of sequences to keep in the DOM
@@ -62,7 +89,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
     const prePrinted = d3.range(staticSeq[0], staticSeq[1]);
 
     prePrinted.forEach(seq => {
-      chart.moveSequence({ index: seq, jump: true });
+      chart.moveSequence({ index: seq, jump: true, duration: 0 });
     });
   }
 
@@ -86,6 +113,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
         // add this note to the sequence progress array
         const thisSeq = sequenceProgress.filter(d => d.index === seqIndex);
+
         thisSeq[0].notes.push(note);
 
         // send the new note data to be updated
@@ -93,10 +121,18 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
         // check if this was the last note of the sequence
         if (notesPlayed === val.length) {
-          // update the sequence
-          chart.moveSequence({ index: seqIndex, jump: false });
+          const finalDuration = findDuration(tempo, note[1]);
+          chart.moveSequence({
+            index: seqIndex,
+            jump: false,
+            duration: finalDuration,
+          });
           // move onto the next sequence
           seqIndex += 1;
+
+          // if this is the live chart, update the live chart count
+          if (condition === 'live') liveChartCount += 1;
+
           // start back at 0
           notesPlayed = 0;
           // make sure that sequenceProgress never has more than 10 items in it
@@ -105,7 +141,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
           // if we haven't hit the last sequence, do this again
           if (seqIndex < sequences.length)
-            setTimeout(() => playNextSequence(), 1000);
+            setTimeout(() => playNextSequence(), finalDuration + 500);
         }
       },
     });
@@ -132,34 +168,55 @@ function makeKeysClickable() {
 function findChartSpecifics(condition) {
   const rend = charts[condition];
   const thisData = rend.data();
-  const maxSequences = condition === 'animated' ? 1 : thisData.result.attempts;
+  const maxSequences =
+    condition === 'animated' ? [0, 1] : [0, thisData.result.attempts];
 
-  if (condition !== 'two') {
-    if (condition === 'results')
-      playChart({
-        chart: rend,
-        thisData,
-        maxSequences: 4,
-        staticSeq: [0, 1],
-      });
-    else if (condition === 'success') {
-      const totalAttempts = thisData.result.recent.length;
-      const lastStatic = totalAttempts - 3;
-      playChart({
-        chart: rend,
-        thisData,
-        maxSequences,
-        staticSeq: [0, lastStatic],
-      });
-    } else if (condition === 'Meryl')
-      playChart({
-        chart: rend,
-        thisData,
-        maxSequences: 5,
-        staticSeq: [0, 0],
-      });
-    else playChart({ chart: rend, thisData, maxSequences, staticSeq: [0, 0] });
-  } else makeKeysClickable();
+  if (condition === 'results')
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences: [0, 4],
+      staticSeq: [0, 1],
+      condition,
+    });
+  else if (condition === 'success') {
+    const totalAttempts = thisData.result.recent.length;
+    const lastStatic = totalAttempts - 3;
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences,
+      staticSeq: [0, lastStatic],
+      condition,
+    });
+  } else if (condition === 'Meryl')
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences: [0, 5],
+      staticSeq: [0, 0],
+      condition,
+    });
+  else if (condition === 'live') {
+    const toCut = liveChartCount < 10;
+    const totalAttempts = thisData.result.recent.length;
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences: toCut
+        ? [0, totalAttempts]
+        : [liveChartCount - 10, totalAttempts],
+      staticSeq: [liveChartCount - 10, liveChartCount],
+      condition,
+    });
+  } else
+    playChart({
+      chart: rend,
+      thisData,
+      maxSequences,
+      staticSeq: [0, 0],
+      condition,
+    });
 }
 
 function setupEnterView() {
@@ -175,7 +232,7 @@ function setupEnterView() {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
 
-      if (condition !== 'all') {
+      if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
         charts[condition].clear();
         findChartSpecifics(condition);
@@ -192,12 +249,32 @@ function setupEnterView() {
 }
 
 function setupRestartButtons() {
+  // update text on last button
+  const finalButton = $buttons
+    .filter((d, i, n) => {
+      return d3.select(n[i]).attr('data-type') === 'all';
+    })
+    .text('Generate Tune');
   $buttons.on('click', function(d) {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
     const chart = charts[type];
     chart.clear();
-    findChartSpecifics(type);
+    if (type === 'all') {
+      const song = data.levels.find(d => d.title === generatedData.title);
+      const seq = GenerateSequence(song);
+      generatedData.result.recent.push(seq);
+
+      const recentLength = generatedData.result.recent.length;
+
+      playChart({
+        chart: charts.all,
+        thisData: generatedData,
+        maxSequences: [0, recentLength],
+        staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
+        condition: 'all',
+      });
+    } else findChartSpecifics(type);
   });
 }
 
@@ -209,6 +286,8 @@ function setupCharts() {
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
   charts[condition] = chart;
+
+  if (condition === 'two') makeKeysClickable();
 }
 
 function setupDropdown(data) {
@@ -228,6 +307,14 @@ function setupDropdown(data) {
 
     const song = data.levels.find(d => d.title === sel);
     const seq = GenerateSequence(song);
+
+    generatedData = {
+      title: song.title,
+      tempo: song.tempo,
+      sig: song.sig,
+      result: { recent: [seq] },
+    };
+
     // TODO play ^ seq
 
     charts.all.clear();
@@ -236,12 +323,26 @@ function setupDropdown(data) {
       .data(song)
       .resize()
       .render();
+
+    playChart({
+      chart: charts.all,
+      thisData: generatedData,
+      maxSequences: [0, 1],
+      staticSeq: [0, 0],
+      condition: 'all',
+    });
   });
+}
+
+function setupNoteMap() {
+  const cwData = crosswalk.map(d => [d.midi, d.note]);
+  cwMapNote = new Map(cwData);
 }
 
 function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
+  setupNoteMap();
   // scroll triggers
   $pianos.each(setupCharts);
   setupEnterView();
