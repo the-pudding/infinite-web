@@ -97,7 +97,10 @@ function inlineAudio() {
 }
 
 function insertText(raw) {
-  const current = raw.levels.find(d => !d.result.done);
+  let index = raw.levels.findIndex(d => d.result && !d.result.done);
+  if (index < 0) index = raw.levels.lastIndexOf(d => d.result);
+  const current = raw.levels[index];
+
   const d = new Date(raw.start);
   const s = d.toDateString();
   const start = `${s.substring(4, 7)}. ${s.substring(8, 10)}, ${s.substring(
@@ -107,10 +110,12 @@ function insertText(raw) {
   d3.select('.beethoven-attempts').text(raw.levels[0].result.attempts);
   d3.select('.beethoven2-attempts').text(raw.levels[1].result.attempts);
   d3.select('.experiment-start').text(start);
-  d3.select('.current-song').html(
-    `<strong>${current.title} by ${current.artist}</strong>`
-  );
-  d3.select('.current-estimate').html(current.estimate);
+  if (current) {
+    d3.select('.current-song').html(
+      `<strong>${current.title} by ${current.artist}</strong>`
+    );
+    d3.select('.current-estimate').html(current.estimate);
+  } else console.log('no current song');
 }
 
 function init(raw) {
