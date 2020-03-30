@@ -84,7 +84,7 @@ d3.selection.prototype.noteChart = function init(options) {
           results = 5;
           break;
         default:
-          results = 10;
+          results = 5;
       }
 
       const resultHeight = (whiteWidth + PADDING) * results;
