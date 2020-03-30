@@ -13,7 +13,7 @@ let cwMap = null;
 let data = [];
 
 function resize() {
-  Piano.resize();
+  // Piano.resize();
 }
 
 function toggleAudio(dir) {
@@ -95,9 +95,28 @@ function inlineAudio() {
     $audio.node().play();
   });
 }
+
+function insertText(raw) {
+  const current = raw.levels.find(d => !d.result.done);
+  const d = new Date(raw.start);
+  const s = d.toDateString();
+  const start = `${s.substring(4, 7)}. ${s.substring(8, 10)}, ${s.substring(
+    11,
+    15
+  )}`;
+  d3.select('.beethoven-attempts').text(raw.levels[0].result.attempts);
+  d3.select('.beethoven2-attempts').text(raw.levels[1].result.attempts);
+  d3.select('.experiment-start').text(start);
+  d3.select('.current-song').html(
+    `<strong>${current.title} by ${current.artist}</strong>`
+  );
+  d3.select('.current-estimate').html(current.estimate);
+}
+
 function init(raw) {
   $intro.selectAll('button').on('click', handleIntro);
   d3.select('.audio').on('click', handleHeader);
+  insertText(raw);
   inlineAudio();
 
   const crosswalk = cleanCrosswalk(dirtyCrosswalk);
