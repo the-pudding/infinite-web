@@ -33,10 +33,10 @@ function clickKey(midi) {
   Tone.Transport.start();
 }
 
-function play({ sequence, tempo, sig, noteCallback }) {
+function play({ sequence, tempo, swapFn, noteCallback }) {
   stop();
   part.removeAll();
-  const s = sequence.map(d => ({ midi: d[0], duration: d[1] }));
+  const s = sequence.map(d => ({ midi: d[0], duration: swapFn(d[1]) }));
   const results = midiToNotation(s);
   const values = results.notesNoRests;
   const original = results.originalNotes;
@@ -45,7 +45,7 @@ function play({ sequence, tempo, sig, noteCallback }) {
     sampler.triggerAttackRelease(value.note, value.duration, time);
   }, values).start(0);
   Tone.Transport.bpm.value = tempo;
-  Tone.Transport.timeSignature = sig || 4;
+  Tone.Transport.timeSignature = 4;
   Tone.Transport.start();
 }
 

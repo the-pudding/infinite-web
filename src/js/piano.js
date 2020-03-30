@@ -39,7 +39,12 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
 
   // max number of sequences to keep in the DOM
   const DOM_CUTOFF = 10;
-  const { tempo, sig } = thisData;
+  const { tempo, swap } = thisData;
+  const swapFn = d => {
+    if (!swap) return d;
+    const [f, r] = swap.split('-').map(v => +v);
+    return d === f ? r : d;
+  };
 
   const sequenceProgress = [];
 
@@ -67,11 +72,10 @@ function playChart({ chart, thisData, maxSequences, staticSeq }) {
   const playNextSequence = () => {
     sequenceProgress.push({ index: seqIndex, notes: [] });
     const sequence = sequences[seqIndex];
-
     Audio.play({
       sequence,
       tempo,
-      sig,
+      swapFn,
       noteCallback: val => {
         // this runs for every note played
         // find the next note that needs to be played
