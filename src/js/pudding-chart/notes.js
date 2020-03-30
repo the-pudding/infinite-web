@@ -244,10 +244,7 @@ d3.selection.prototype.noteChart = function init(options) {
 
         $keyGroup
           .selectAll('.key')
-          .data(d => {
-            console.log({ d });
-            return [d];
-          })
+          .data(d => [d])
           .join(enter =>
             enter
               .append('rect')
@@ -270,9 +267,6 @@ d3.selection.prototype.noteChart = function init(options) {
 
         if (restExists.length) {
           // if there's a rest key, add it and add text
-          const restCoord = pianoData.filter(d => d.midi === 0)[0].coord; // .coord;
-
-          // console.log({ restCoord });
 
           // add text to rest key
           $vis

@@ -28,7 +28,7 @@ export default function midiToNotation(arr) {
   const notesNoRests = b.filter(d => d.note);
   const flat = arr.map(({ midi, duration }) => {
     const match = pianoData.find(p => +p.midi === midi);
-    const note = match ? `${match.note}${match.octave}` : null;
+    const note = match ? `${match.note}` : null;
     return [midi, duration, note];
   });
   return { notesNoRests, originalNotes: flat };

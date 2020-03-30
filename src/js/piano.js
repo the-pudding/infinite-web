@@ -11,6 +11,7 @@ const charts = {};
 
 let data = [];
 let crosswalk = [];
+let cwMapNote = [];
 
 // keep track of how far into this, the live chart has gone
 let liveChartCount = 0;
@@ -37,6 +38,16 @@ function filterData(condition) {
 }
 
 function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
+  // add note data to played tones
+  thisData.result.recent.forEach(seq => {
+    seq.forEach(tone => {
+      const note = cwMapNote.get(tone[0]);
+      tone.push(note);
+      return tone;
+    });
+    return seq;
+  });
+
   const sequences = thisData.result.recent.slice(
     maxSequences[0],
     maxSequences[1]
@@ -88,6 +99,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
 
         // add this note to the sequence progress array
         const thisSeq = sequenceProgress.filter(d => d.index === seqIndex);
+
         thisSeq[0].notes.push(note);
 
         // send the new note data to be updated
@@ -268,9 +280,15 @@ function setupDropdown(data) {
   });
 }
 
+function setupNoteMap() {
+  const cwData = crosswalk.map(d => [d.midi, d.note]);
+  cwMapNote = new Map(cwData);
+}
+
 function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
+  setupNoteMap();
   // scroll triggers
   $pianos.each(setupCharts);
   setupEnterView();
