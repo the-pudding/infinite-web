@@ -13,6 +13,8 @@ let data = [];
 let crosswalk = [];
 let cwMapNote = [];
 
+let generatedData = {};
+
 // keep track of how far into this, the live chart has gone
 let liveChartCount = 0;
 
@@ -243,12 +245,32 @@ function setupEnterView() {
 }
 
 function setupRestartButtons() {
+  // update text on last button
+  const finalButton = $buttons
+    .filter((d, i, n) => {
+      return d3.select(n[i]).attr('data-type') === 'all';
+    })
+    .text('Generate Tune');
   $buttons.on('click', function(d) {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
     const chart = charts[type];
     chart.clear();
-    findChartSpecifics(type);
+    if (type === 'all') {
+      const song = data.levels.find(d => d.title === generatedData.title);
+      const seq = GenerateSequence(song);
+      generatedData.result.recent.push(seq);
+
+      const recentLength = generatedData.result.recent.length;
+
+      playChart({
+        chart: charts.all,
+        thisData: generatedData,
+        maxSequences: [0, recentLength],
+        staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
+        condition: 'all',
+      });
+    } else findChartSpecifics(type);
   });
 }
 
@@ -282,7 +304,7 @@ function setupDropdown(data) {
     const song = data.levels.find(d => d.title === sel);
     const seq = GenerateSequence(song);
 
-    const generatedData = {
+    generatedData = {
       title: song.title,
       tempo: song.tempo,
       sig: song.sig,
