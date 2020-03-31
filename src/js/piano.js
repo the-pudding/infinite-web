@@ -1,4 +1,5 @@
 /* global d3 */
+import jump from 'jump.js';
 import EnterView from 'enter-view';
 import Audio from './audio';
 import GenerateSequence from './generate-sequence';
@@ -336,8 +337,6 @@ function setupDropdown(data) {
       result: { recent: [seq] },
     };
 
-    // TODO play ^ seq
-
     charts.all.clear();
 
     charts.all
@@ -352,6 +351,8 @@ function setupDropdown(data) {
       staticSeq: [0, 0],
       condition: 'all',
     });
+
+    jump(this, { offset: -64, duration: 500 });
   });
 }
 
