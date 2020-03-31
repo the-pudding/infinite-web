@@ -232,7 +232,6 @@ function setupEnterView() {
     enter(el) {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
-      console.log(el);
       Audio.stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
@@ -241,7 +240,6 @@ function setupEnterView() {
       }
     },
     exit(el) {
-      console.log(el);
       Audio.stop();
     },
     offset: 0.6,
