@@ -102,9 +102,11 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
     sequenceProgress.push({ index: seqIndex, notes: [] });
     const sequence = sequences[seqIndex];
     Audio.play({
+      chart,
       sequence,
       tempo,
       swapFn,
+      condition,
       noteCallback: val => {
         // this runs for every note played
         // find the next note that needs to be played
@@ -228,19 +230,19 @@ function setupEnterView() {
   EnterView({
     selector: '.figure__piano',
     enter(el) {
-      // pause other charts
-      Object.keys(charts).forEach(() => Audio.stop());
-
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
+      console.log(el);
+      Audio.stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
         charts[condition].clear();
         findChartSpecifics(condition);
       }
     },
-    exit(el, i) {
-      Object.keys(charts).forEach(() => Audio.stop());
+    exit(el) {
+      console.log(el);
+      Audio.stop();
     },
     offset: 0.6,
     once: false,
@@ -325,6 +327,7 @@ function setupDropdown(data) {
   };
 
   dd.on('change', function() {
+    Audio.stop();
     const sel = d3.select(this).property('value');
 
     const song = data.levels.find(d => d.title === sel);

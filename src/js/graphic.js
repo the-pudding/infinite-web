@@ -17,9 +17,9 @@ function resize() {
   // Piano.resize();
 }
 
-function toggleAudio(dir) {
+function toggleAudio() {
   const isOn = $header.select('.audio .on').classed('is-visible');
-  const goOn = dir ? dir === 'on' : !isOn;
+  const goOn = !isOn;
   const over = goOn ? 'on. Good choice.' : 'off.';
   $intro.select('.intro__overline span').text(over);
   $header.select('.on').classed('is-visible', goOn);
@@ -121,7 +121,7 @@ function insertText(raw) {
 function init(raw) {
   $intro.selectAll('button').on('click', handleIntro);
   d3.select('.audio').on('click', toggleAudio);
-  $overline.on('click', toggleAudio);
+  $overline.select('button').on('click', toggleAudio);
   insertText(raw);
   inlineAudio();
 

@@ -7,7 +7,6 @@ let part = new Tone.Part(() => {}, []);
 Tone.Master.mute = true;
 
 function stop() {
-  // make sure there is a transport to stop
   Tone.Transport.stop();
 }
 
@@ -29,7 +28,7 @@ function clickKey(midi) {
   Tone.Transport.start();
 }
 
-function play({ sequence, tempo, swapFn, noteCallback }) {
+function play({ sequence, tempo, swapFn, noteCallback, condition }) {
   stop();
   part.removeAll();
   const s = sequence.map(d => ({ midi: d[0], duration: swapFn(d[1]) }));

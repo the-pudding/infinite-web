@@ -19,7 +19,7 @@ select
 	font-family $sans
 	set-type-size(small)
 	display block
-	margin 3rem auto 0 auto
+	margin 3rem auto 2rem auto
 
 article
 	margin 0 auto
@@ -46,12 +46,15 @@ article
 	line-height 1
 
 	&:hover
-		outline 2px solid $highlight
+		background-color $gray-dark
 
 	&.figure__correct
 		margin-left -0.625em
 		background-color $right
 		color $fg
+
+		&:hover
+			background-color lighten($right, 10)
 
 	svg
 		width 1em
@@ -112,3 +115,6 @@ figure
 		background-color $gray-light
 		color $off-black
 		font-size 0.9em
+
+		&:hover
+			background-color $gray
