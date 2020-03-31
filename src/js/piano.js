@@ -24,7 +24,7 @@ function filterData(condition) {
   const setupPianos = ['two', 'animated', 'results', 'success', 'all'];
   if (setupPianos.includes(condition)) {
     [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5 I');
-  } else if (condition === 'Meryl') {
+  } else if (condition === 'beethoven2') {
     [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5  II');
   } else {
     // find which songs already have results
@@ -189,11 +189,14 @@ function findChartSpecifics(condition) {
       staticSeq: [0, lastStatic],
       condition,
     });
-  } else if (condition === 'Meryl')
+  } else if (condition === 'beethoven2')
     playChart({
       chart: rend,
       thisData,
-      maxSequences: [0, 5],
+      maxSequences: [
+        thisData.result.recent.length - 5,
+        thisData.result.recent.length,
+      ],
       staticSeq: [0, 0],
       condition,
     });
@@ -345,6 +348,7 @@ function setupNoteMap() {
 function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
+  console.log(data);
   setupNoteMap();
   Audio.init(() => {
     // scroll triggers
