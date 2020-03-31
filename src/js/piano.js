@@ -9,6 +9,7 @@ const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
 const $buttons = $article.selectAll('.figure__restart');
 const $correct = $article.selectAll('.figure__correct');
+const $closest = $article.selectAll('.figure__closest');
 const charts = {};
 
 let data = [];
@@ -50,22 +51,26 @@ function findDuration(tempo, duration) {
 }
 
 function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
+  const resultLength = thisData.result.recent.length;
   // add note data to played tones
   thisData.result.recent.forEach(seq => {
     seq.forEach(tone => {
-      const note = cwMapNote.get(tone[0]);
-      tone.push(note);
+      if (tone.length < 3) {
+        const note = cwMapNote.get(tone[0]);
+        tone.push(note);
+      }
       return tone;
     });
     return seq;
   });
+
+  const { attempts } = thisData.result;
 
   const sequences = thisData.result.recent.slice(
     maxSequences[0],
     maxSequences[1]
   );
   const staticData = thisData.result.recent.slice(staticSeq[0], staticSeq[1]);
-
   // max number of sequences to keep in the DOM
   const DOM_CUTOFF = 10;
   const { tempo, swap } = thisData;
@@ -83,15 +88,23 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
     seqIndex = staticData.length;
 
     staticData.forEach((seq, i) => {
-      sequenceProgress.push({ index: i, notes: seq });
+      sequenceProgress.push({
+        index: i,
+        notes: seq,
+        attempts: attempts - resultLength + staticSeq[0] + i,
+      });
     });
 
-    chart.update({ sequenceProgress, jump: true });
+    chart.update({ sequenceProgress, jump: true, condition });
 
     const prePrinted = d3.range(staticSeq[0], staticSeq[1]);
 
     prePrinted.forEach(seq => {
-      chart.moveSequence({ index: seq, jump: true, duration: 0 });
+      chart.moveSequence({
+        index: seq - staticSeq[0],
+        jump: true,
+        duration: 0,
+      });
     });
   }
 
@@ -99,7 +112,12 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
   let notesPlayed = 0;
 
   const playNextSequence = () => {
-    sequenceProgress.push({ index: seqIndex, notes: [] });
+    sequenceProgress.push({
+      index: seqIndex,
+      notes: [],
+      attempts: attempts - resultLength + maxSequences[0] + seqIndex,
+    });
+
     const sequence = sequences[seqIndex];
     Audio.play({
       chart,
@@ -121,7 +139,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
         thisSeq[0].notes.push(note);
 
         // send the new note data to be updated
-        chart.update({ sequenceProgress, jump: false });
+        chart.update({ sequenceProgress, jump: false, condition });
 
         // check if this was the last note of the sequence
         if (notesPlayed === val.length) {
@@ -213,7 +231,7 @@ function findChartSpecifics(condition) {
       maxSequences: toCut
         ? [0, totalAttempts]
         : [liveChartCount - 10, totalAttempts],
-      staticSeq: [liveChartCount - 10, liveChartCount],
+      staticSeq: [Math.max(liveChartCount - 10, 0), liveChartCount],
       condition,
     });
   } else
@@ -248,7 +266,9 @@ function setupEnterView() {
 }
 function handleAllClick(btn) {
   const song = data.levels.find(d => d.title === generatedData.title);
-  const seq = GenerateSequence(song);
+
+  const correctSeq = song.sequence.map(d => [d.midi, d.duration]);
+  const seq = btn === 'correct' ? correctSeq : GenerateSequence(song);
   generatedData.result.recent.push(seq);
 
   const recentLength = generatedData.result.recent.length;
@@ -273,6 +293,7 @@ function setupRestartButtons() {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
     const chart = charts[type];
+    Audio.stop();
     chart.clear();
     if (type === 'all') {
       handleAllClick('generate');
@@ -282,18 +303,31 @@ function setupRestartButtons() {
   $correct.on('click', function(d) {
     charts.all.clear();
     handleAllClick('correct');
-    // const song = data.levels.find(d => d.title === generatedData.title);
-    // const seq = song.sequence.map(d => [d.midi, d.duration]);
-    // generatedData.result.recent.push(seq);
-    // const recentLength = generatedData.result.recent.length;
+  });
 
-    // playChart({
-    //   chart: charts.all,
-    //   thisData: generatedData,
-    //   maxSequences: [0, recentLength],
-    //   staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
-    //   condition: 'all',
-    // });
+  $closest.on('click', () => {
+    Audio.stop();
+    charts.live.clear();
+
+    // find which songs already have results
+    const hasResults = data.levels.filter(d => d.result);
+
+    // keep last one (presumably the one still running)
+    const song = hasResults.pop();
+    const closest = song.nearestIndex;
+    const recentLength = song.result.recent.length;
+    const toCut = closest < 10;
+
+    // reset live chart global count
+    liveChartCount = closest;
+
+    playChart({
+      chart: charts.live,
+      thisData: song,
+      maxSequences: toCut ? [0, recentLength] : [closest - 10, recentLength],
+      staticSeq: [Math.max(closest - 10, 0), closest],
+      condition: 'live',
+    });
   });
 }
 

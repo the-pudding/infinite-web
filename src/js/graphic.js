@@ -1,5 +1,6 @@
 /* global d3 */
 import jump from 'jump.js';
+import findNearest from './findNearest';
 import dirtyCrosswalk from './pianoData.json';
 import findUnique from './utils/unique';
 import Piano from './piano';
@@ -73,10 +74,18 @@ function cleanCrosswalk(cw) {
 }
 
 function cleanData({ raw, crosswalk }) {
-  const cleanedLevels = raw.levels.map(d => ({
-    ...d,
-    keys: findKeys({ range: d.range.midis, crosswalk }),
-  }));
+  const cleanedLevels = raw.levels.map(d => {
+    return {
+      ...d,
+      keys: findKeys({ range: d.range.midis, crosswalk }),
+      nearestIndex: d.result
+        ? findNearest({
+            recent: d.result.recent,
+            sequence: d.sequence,
+          })
+        : null,
+    };
+  });
 
   const cleaned = [raw].map(d => ({
     ...d,
