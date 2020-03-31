@@ -52,6 +52,15 @@ d3.selection.prototype.noteChart = function init(options) {
       return [...new Set(arr)];
     }
 
+    function placeNotes(pianoData, midis) {
+      const posMidis = midis.map(d => {
+        const { coord } = pianoData.filter(e => e.midi === d)[0];
+        return { midi: d, coord };
+      });
+
+      return posMidis;
+    }
+
     function adjustFigureDimensions() {
       keyboardHeight = Math.floor(
         $vis
@@ -217,12 +226,13 @@ d3.selection.prototype.noteChart = function init(options) {
         // generate data for keys and guides
         const pianoData = generatePiano();
         const guideData = setupGuide(pianoData, data.sequence);
+        const placementData = placeNotes(pianoData, data.range.midis);
 
         // find which keys are used in current sequence
-        const activeKeys = findUnique(data.sequence.map(d => d.midi));
+        const activeKeys = data.range.midis; // findUnique(data.sequence.map(d => d.midi));
 
         // create a key map
-        const keyCoord = guideData.map(d => [d.midi, d.coord]);
+        const keyCoord = placementData.map(d => [d.midi, d.coord]);
         keyMap = new Map(keyCoord);
 
         // append the piano
