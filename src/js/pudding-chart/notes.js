@@ -80,7 +80,7 @@ d3.selection.prototype.noteChart = function init(options) {
         case 'success':
           results = 5;
           break;
-        case 'Meryl':
+        case 'beethoven2':
           results = 5;
           break;
         case 'all':
