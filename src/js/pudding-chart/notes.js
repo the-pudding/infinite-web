@@ -351,7 +351,7 @@ d3.selection.prototype.noteChart = function init(options) {
       clear() {
         $vis.selectAll('.sequence').remove();
       },
-      update({ sequenceProgress, jump }) {
+      update({ sequenceProgress, jump, condition }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
         const $group = $vis.select('.g-notes');
 
@@ -444,6 +444,27 @@ d3.selection.prototype.noteChart = function init(options) {
             (d, i) => `translate(${scaleXGuide(i)}, ${keyboardHeight})`
           );
         // .attr('y', keyboardHeight);
+
+        // add count if condition  is 'live'
+        if (thisChart === 'live') {
+          const attempt = $justFinished.data()[0].attempts;
+
+          $justFinished
+
+            .append('text')
+            .text(`Attempt #${attempt}`)
+            .attr(
+              'transform',
+              `translate(${width - whiteHeight}, ${keyboardHeight +
+                whiteWidth / 2} )`
+            )
+            .attr('alignment-baseline', 'middle')
+            .style('opacity', 0)
+            .transition()
+            .delay(ANIMATION_DELAY)
+            .duration(0)
+            .style('opacity', 1);
+        }
 
         const $allFinished = $vis.selectAll('.finished').nodes();
         $allFinished.forEach((g, index) => {
