@@ -83,6 +83,9 @@ d3.selection.prototype.noteChart = function init(options) {
         case 'Meryl':
           results = 5;
           break;
+        case 'all':
+          results = 1;
+          break;
         default:
           results = 5;
       }

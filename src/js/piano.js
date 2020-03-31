@@ -21,7 +21,7 @@ let liveChartCount = 0;
 function filterData(condition) {
   let specificData = null;
   // separate out phases for the first few steps which repeat the same piano
-  const setupPianos = ['two', 'animated', 'results', 'success'];
+  const setupPianos = ['two', 'animated', 'results', 'success', 'all'];
   if (setupPianos.includes(condition)) {
     [specificData] = data.levels.filter(d => d.title === 'Symphony No. 5 I');
   } else if (condition === 'Meryl') {
@@ -264,6 +264,7 @@ function setupRestartButtons() {
       const song = data.levels.find(d => d.title === generatedData.title);
       const seq = GenerateSequence(song);
       generatedData.result.recent.push(seq);
+      console.log({ seq, generatedData });
 
       const recentLength = generatedData.result.recent.length;
 
@@ -301,6 +302,14 @@ function setupDropdown(data) {
         .attr('value', d => d)
         .text(d => d)
     );
+
+  // make default dd the default for generated data
+  const defaultSong = data.levels.find(d => d.title === levels[0]);
+  generatedData = {
+    title: defaultSong.title,
+    tempo: defaultSong.tempo,
+    result: { recent: [] },
+  };
 
   dd.on('change', function() {
     const sel = d3.select(this).property('value');
