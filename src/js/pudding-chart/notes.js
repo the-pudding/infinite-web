@@ -28,8 +28,8 @@ d3.selection.prototype.noteChart = function init(options) {
     let width = 0;
     let height = 0;
     let pageHeight = 0;
-    const MARGIN_TOP = 24;
-    const MARGIN_BOTTOM = 48;
+    const MARGIN_TOP = 16;
+    const MARGIN_BOTTOM = 64;
     const MARGIN_LEFT = 16;
     const MARGIN_RIGHT = 16;
     // height of white keys
