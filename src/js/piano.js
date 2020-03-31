@@ -7,6 +7,7 @@ import './pudding-chart/notes';
 const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
 const $buttons = $article.selectAll('.figure__restart');
+const $correct = $article.selectAll('.figure__correct');
 const charts = {};
 
 let data = [];
@@ -251,8 +252,8 @@ function setupRestartButtons() {
     .filter((d, i, n) => {
       return d3.select(n[i]).attr('data-type') === 'all';
     })
-    .text('Generate Tune');
-  $buttons.on('click', function(d) {
+    .text('Generate Attempt');
+  $buttons.on('click', function() {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
     const chart = charts[type];
@@ -261,7 +262,6 @@ function setupRestartButtons() {
       const song = data.levels.find(d => d.title === generatedData.title);
       const seq = GenerateSequence(song);
       generatedData.result.recent.push(seq);
-      console.log({ seq, generatedData });
 
       const recentLength = generatedData.result.recent.length;
 
@@ -273,6 +273,21 @@ function setupRestartButtons() {
         condition: 'all',
       });
     } else findChartSpecifics(type);
+  });
+
+  $correct.on('click', () => {
+    const song = data.levels.find(d => d.title === generatedData.title);
+    const seq = song.sequence.map(d => [d.midi, d.duration]);
+    generatedData.result.recent.push(seq);
+    const recentLength = generatedData.result.recent.length;
+
+    playChart({
+      chart: charts.all,
+      thisData: generatedData,
+      maxSequences: [0, recentLength],
+      staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
+      condition: 'all',
+    });
   });
 }
 
@@ -348,7 +363,6 @@ function setupNoteMap() {
 function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
-  console.log(data);
   setupNoteMap();
   Audio.init(() => {
     // scroll triggers

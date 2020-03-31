@@ -14,6 +14,13 @@ main.is-ready #intro
 	.loading
 		display none
 
+select
+	font-weight bold
+	font-family $sans
+	set-type-size(small)
+	display block
+	margin 3rem auto 0 auto
+
 article
 	margin 0 auto
 	padding 1rem
@@ -37,6 +44,11 @@ article
 	font-size 1em
 	font-family $sans
 	line-height 1
+
+	&.figure__correct
+		margin-left -0.625em
+		background-color $right
+		color $fg
 
 	svg
 		width 1em
