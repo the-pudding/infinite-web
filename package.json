@@ -10,6 +10,7 @@
   "dependencies": {
     "enter-view": "^2.0.0",
     "jump.js": "^1.0.2",
+    "levdist": "^2.2.9",
     "lodash.debounce": "4.0.8",
     "nouislider": "14.1.1",
     "superagent": "5.2.2",
