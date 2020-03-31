@@ -246,6 +246,21 @@ function setupEnterView() {
     once: false,
   });
 }
+function handleAllClick(btn) {
+  const song = data.levels.find(d => d.title === generatedData.title);
+  const seq = GenerateSequence(song);
+  generatedData.result.recent.push(seq);
+
+  const recentLength = generatedData.result.recent.length;
+
+  playChart({
+    chart: charts.all,
+    thisData: generatedData,
+    maxSequences: [0, recentLength],
+    staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
+    condition: 'all',
+  });
+}
 
 function setupRestartButtons() {
   // update text on last button
@@ -260,35 +275,24 @@ function setupRestartButtons() {
     const chart = charts[type];
     chart.clear();
     if (type === 'all') {
-      const song = data.levels.find(d => d.title === generatedData.title);
-      const seq = GenerateSequence(song);
-      generatedData.result.recent.push(seq);
-
-      const recentLength = generatedData.result.recent.length;
-
-      playChart({
-        chart: charts.all,
-        thisData: generatedData,
-        maxSequences: [0, recentLength],
-        staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
-        condition: 'all',
-      });
+      handleAllClick('generate');
     } else findChartSpecifics(type);
   });
 
-  $correct.on('click', () => {
-    const song = data.levels.find(d => d.title === generatedData.title);
-    const seq = song.sequence.map(d => [d.midi, d.duration]);
-    generatedData.result.recent.push(seq);
-    const recentLength = generatedData.result.recent.length;
+  $correct.on('click', function(d) {
+    handleAllClick('correct');
+    // const song = data.levels.find(d => d.title === generatedData.title);
+    // const seq = song.sequence.map(d => [d.midi, d.duration]);
+    // generatedData.result.recent.push(seq);
+    // const recentLength = generatedData.result.recent.length;
 
-    playChart({
-      chart: charts.all,
-      thisData: generatedData,
-      maxSequences: [0, recentLength],
-      staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
-      condition: 'all',
-    });
+    // playChart({
+    //   chart: charts.all,
+    //   thisData: generatedData,
+    //   maxSequences: [0, recentLength],
+    //   staticSeq: [0, recentLength > 0 ? recentLength - 1 : 0],
+    //   condition: 'all',
+    // });
   });
 }
 
