@@ -98,7 +98,7 @@ function inlineAudio() {
 
 function insertText(raw) {
   let index = raw.levels.findIndex(d => d.result && !d.result.done);
-  if (index < 0) index = raw.levels.lastIndexOf(d => d.result);
+  if (index < 0) index = raw.levels.filter(d => d.result).length - 1;
   const current = raw.levels[index];
 
   const d = new Date(raw.start);
