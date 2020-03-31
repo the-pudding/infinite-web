@@ -248,7 +248,10 @@ function setupEnterView() {
 }
 function handleAllClick(btn) {
   const song = data.levels.find(d => d.title === generatedData.title);
-  const seq = GenerateSequence(song);
+
+  const correctSeq = song.sequence.map(d => [d.midi, d.duration]);
+  console.log({ correctSeq });
+  const seq = btn === 'correct' ? correctSeq : GenerateSequence(song);
   generatedData.result.recent.push(seq);
 
   const recentLength = generatedData.result.recent.length;
