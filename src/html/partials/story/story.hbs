@@ -8,10 +8,13 @@
 	{{/if}}
 	{{#if graphic}}
 	<figure class='figure__{{graphic}}' data-type={{{type}}}>
-		<button class='btn figure__restart' data-type={{{type}}}>Replay <img inline src='refresh-ccw.svg'></button>
-		{{#ifEquals type 'all'}}
-		<button class='btn figure__correct'>Play Correct</button>
-		{{/ifEquals}}
+		<p class="figure__overline is-visible">Audio is off. <button class='btn'>Turn on</button></p>
+		<div class='figure__inner'>
+			<button class='btn figure__restart' data-type={{{type}}}>Replay <img inline src='refresh-ccw.svg'></button>
+			{{#ifEquals type 'all'}}
+				<button class='btn figure__correct'>Play Correct</button>
+			{{/ifEquals}}
+		</div>
 	</figure>
 	{{/if}}
 

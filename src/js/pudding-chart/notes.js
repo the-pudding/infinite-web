@@ -97,7 +97,7 @@ d3.selection.prototype.noteChart = function init(options) {
         buttonHeight +
         MARGIN_TOP +
         MARGIN_BOTTOM;
-      $chart.style('height', `${newHeight}px`);
+      $chart.select('.figure__inner').style('height', `${newHeight}px`);
       $svg.style('height', `${newHeight}px`);
       height = newHeight - MARGIN_TOP - MARGIN_BOTTOM;
     }
@@ -181,7 +181,10 @@ d3.selection.prototype.noteChart = function init(options) {
     const Chart = {
       // called once at start
       init() {
-        $svg = $chart.append('svg').attr('class', 'graphic__piano');
+        $svg = $chart
+          .select('.figure__inner')
+          .append('svg')
+          .attr('class', 'graphic__piano');
 
         // setup viz group
         $vis = $svg.append('g').attr('class', 'g-vis');

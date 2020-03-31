@@ -87,3 +87,25 @@ figure
 
 .hidden-audio
 	display none
+
+.figure__overline
+	set-type-size(small)
+	position absolute
+	top 0
+	left 0
+	visibility hidden
+	margin 0
+	width 100%
+	text-align right
+	font-family $sans
+	line-height 1
+	transform translateY(-132.5%)
+
+	&.is-visible
+		visibility visible
+
+	button
+		padding 0.5em
+		background-color $gray-light
+		color $off-black
+		font-size 0.75em

@@ -8,6 +8,7 @@ import volume2Svg from './volume2';
 
 const $intro = d3.select('#intro');
 const $header = d3.select('header');
+const $overline = d3.selectAll('.figure__overline');
 
 let cwMap = null;
 let data = [];
@@ -23,10 +24,9 @@ function toggleAudio(dir) {
   $intro.select('.intro__overline span').text(over);
   $header.select('.on').classed('is-visible', goOn);
   $header.select('.off').classed('is-visible', !goOn);
+  $overline.classed('is-visible', !goOn);
+
   Audio.mute(!goOn);
-}
-function handleHeader() {
-  toggleAudio();
 }
 
 function handleIntro() {
@@ -120,7 +120,8 @@ function insertText(raw) {
 
 function init(raw) {
   $intro.selectAll('button').on('click', handleIntro);
-  d3.select('.audio').on('click', handleHeader);
+  d3.select('.audio').on('click', toggleAudio);
+  $overline.on('click', toggleAudio);
   insertText(raw);
   inlineAudio();
 

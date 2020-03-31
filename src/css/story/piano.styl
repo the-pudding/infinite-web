@@ -1,24 +1,26 @@
 .figure__piano
 	position relative
-	overflow hidden
 	padding 0
-	height 320px
 
-	&:after
-		position absolute
-		bottom 0
-		left 0
-		display block
-		width 100%
-		height 1.5rem
-		background-image linear-gradient(to bottom, rgba($off-white, 0) 0, $off-white 90%, $off-white 100%)
-		content ''
+	.figure__inner
+		overflow hidden
+		height 320px
+
+		&:after
+			position absolute
+			bottom 0
+			left 0
+			display block
+			width 100%
+			height 1.5rem
+			background-image linear-gradient(to bottom, rgba($off-white, 0) 0, $off-white 90%, $off-white 100%)
+			content ''
 
 	&[data-type='all']
 		margin-top 1rem
 
 	&[data-type='two']
-		button
+		.figure__restart
 			display none
 
 		.key.active
