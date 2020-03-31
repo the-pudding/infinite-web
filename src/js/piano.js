@@ -369,7 +369,6 @@ function setupDropdown(data) {
 
     const song = data.levels.find(d => d.title === sel);
     const seq = GenerateSequence(song);
-    console.log({ song });
 
     generatedData = {
       title: song.title,
