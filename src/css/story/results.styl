@@ -1,21 +1,75 @@
 .figure__results
 	max-width 60rem
 
+	.inner
+		overflow hidden
+		max-height 41rem
+
+		+mq('bp-4')
+			max-height none
+
+		&.is-visible
+			max-height none
+
 	table
 		width 100%
 
-	td, th
+	thead
+		display none
+
+		+mq('bp-4')
+			display table-header-group
+
+	tbody
+		width 100%
+
+	tr, td, th
+		display block
+		padding 0
+
+	tr
+		margin 0 0 1em 0
 		padding 0.5em
+
+		+mq('bp-4')
+			display table-row
+
+	td[data-title]:before
+		display inline-block
+		float left
+		margin-right 0.5em
+		content attr(data-title)
+		content attr(data-title)
+		font-weight bold
+
+		+mq('bp-4')
+			display none
+
+	td, th
+		padding 0.25em
 		text-align right
+
+		+mq('bp-4')
+			display table-cell
+
+		+mq('bp-4')
+			padding 0.5em
+
+	span
+		display none
 
 	th
 		vertical-align bottom
 		font-size 0.8em
 
 	tbody tr
-		border-top 1px dashed $fg
+		background-color $gray-light
 		vertical-align middle
 		font-size 0.7em
+
+		+mq('bp-4')
+			border-top 1px dashed $fg
+			background-color transparent
 
 		&.is-success
 			background-color rgba($right, 0.33)
@@ -24,8 +78,23 @@
 			background-color rgba($highlight, 0.33)
 
 	td:nth-child(1), th:nth-child(1)
-		text-align left
+		+mq('bp-4')
+			text-align left
 
-		span
-			display block
-			font-size 0.8em
+			span
+				display block
+				font-size 0.8em
+
+	td:nth-child(2), th:nth-child(2)
+		+mq('bp-4')
+			display none
+
+	p
+		margin 0
+		text-align center
+
+		+mq('bp-4')
+			display none
+
+	button
+		padding 0.5em

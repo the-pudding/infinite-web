@@ -1,5 +1,12 @@
 /* global d3 */
 const $table = d3.select('.figure__results table');
+const $btn = d3.select('.figure__results button');
+const $inner = d3.select('.figure__results .inner');
+function toggleTable() {
+  const visible = $inner.classed('is-visible');
+  $inner.classed('is-visible', !visible);
+  $btn.text(visible ? 'Show All' : 'Hide All');
+}
 
 function format(num) {
   let out = '';
@@ -35,14 +42,32 @@ function init({ levels }) {
     .join('tr');
   $tr.classed('is-success', d => d.result && d.result.done);
   $tr.classed('is-progress', d => d.result && !d.result.done);
-  $tr.append('td').html(d => `${d.title} <span><em>${d.artist}</em></span>`);
-  $tr.append('td').text((d, i) => `${i === 0 ? '1 in ' : ''}${format(d.odds)}`);
-  $tr.append('td').text(d => (d.result ? format(d.result.attempts) : 'NA'));
-  $tr.append('td').text(d => {
-    if (d.result && d.result.done) return `Finished ${getDate(d.result.end)}`;
-    if (d.result) return d.estimate;
-    return `In ${d.estimate}`;
-  });
+  $tr
+    .append('td')
+    .attr('data-title', 'Song')
+    .html(d => `${d.title} <span><em>${d.artist}</em></span>`);
+  $tr
+    .append('td')
+    .attr('data-title', 'Artist')
+    .text(d => d.artist);
+  $tr
+    .append('td')
+    .attr('data-title', 'Odds')
+    .text((d, i) => `${i === 0 ? '1 in ' : ''}${format(d.odds)}`);
+  $tr
+    .append('td')
+    .attr('data-title', 'Attempts')
+    .text(d => (d.result ? format(d.result.attempts) : 'NA'));
+  $tr
+    .append('td')
+    .attr('data-title', 'Est. Completion')
+    .text(d => {
+      if (d.result && d.result.done) return `Finished ${getDate(d.result.end)}`;
+      if (d.result) return d.estimate;
+      return `In ${d.estimate}`;
+    });
+
+  $btn.on('click', toggleTable);
 }
 
 export default { init };
