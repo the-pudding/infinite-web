@@ -280,6 +280,7 @@ function setupRestartButtons() {
   });
 
   $correct.on('click', function(d) {
+    charts.all.clear();
     handleAllClick('correct');
     // const song = data.levels.find(d => d.title === generatedData.title);
     // const seq = song.sequence.map(d => [d.midi, d.duration]);
