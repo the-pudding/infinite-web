@@ -2,13 +2,9 @@ import Tone from 'tone';
 import samples from './samples.json';
 import midiToNotation from './midi-to-notation';
 
+let sampler;
 let part = new Tone.Part(() => {}, []);
 Tone.Master.mute = true;
-
-const sampler = new Tone.Sampler(samples, {
-  release: 0.5,
-  baseUrl: 'assets/notes/',
-}).toMaster();
 
 function stop() {
   // make sure there is a transport to stop
@@ -49,4 +45,12 @@ function play({ sequence, tempo, swapFn, noteCallback }) {
   Tone.Transport.start();
 }
 
-export default { play, stop, clickKey, mute };
+function init(cb) {
+  sampler = new Tone.Sampler(samples, {
+    release: 0.5,
+    baseUrl: 'assets/notes/',
+    onload: cb,
+  }).toMaster();
+}
+
+export default { init, play, stop, clickKey, mute };

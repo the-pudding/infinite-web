@@ -222,16 +222,12 @@ function findChartSpecifics(condition) {
 function setupEnterView() {
   EnterView({
     selector: '.figure__piano',
-    enter(el, i) {
+    enter(el) {
       // pause other charts
-      Object.keys(charts).map(d => {
-        // const val = charts[d];
-        Audio.stop();
-      });
+      Object.keys(charts).forEach(() => Audio.stop());
 
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
-
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
         charts[condition].clear();
@@ -239,9 +235,7 @@ function setupEnterView() {
       }
     },
     exit(el, i) {
-      Object.keys(charts).map(d => {
-        Audio.stop();
-      });
+      Object.keys(charts).forEach(() => Audio.stop());
     },
     offset: 0.6,
     once: false,
@@ -352,11 +346,13 @@ function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
   setupNoteMap();
-  // scroll triggers
-  $pianos.each(setupCharts);
-  setupEnterView();
-  setupRestartButtons();
-  setupDropdown(data);
+  Audio.init(() => {
+    // scroll triggers
+    $pianos.each(setupCharts);
+    setupEnterView();
+    setupRestartButtons();
+    setupDropdown(data);
+  });
 }
 
 function resize() {
