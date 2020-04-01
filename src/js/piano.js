@@ -369,13 +369,12 @@ function setupDropdown(data) {
     const sel = d3.select(this).property('value');
 
     const song = data.levels.find(d => d.title === sel);
-    const seq = GenerateSequence(song);
 
     generatedData = {
       title: song.title,
       tempo: song.tempo,
       sig: song.sig,
-      result: { recent: [seq] },
+      result: { recent: [] },
     };
 
     charts.all.clear();
@@ -384,14 +383,6 @@ function setupDropdown(data) {
       .data(song)
       .resize()
       .render();
-
-    playChart({
-      chart: charts.all,
-      thisData: generatedData,
-      maxSequences: [0, 1],
-      staticSeq: [0, 0],
-      condition: 'all',
-    });
 
     jump(this, { offset: -64, duration: 500 });
   });
