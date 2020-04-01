@@ -122,7 +122,7 @@ function insertText(raw) {
   const est =
     current.estimate === 'Anytime now...'
       ? 'anytime now'
-      : `in the next ${current.estimate} or so.`;
+      : `in the next ${current.estimate} or so`;
   d3.select('.beethoven-attempts').text(raw.levels[0].result.attempts);
   d3.select('.beethoven2-attempts').text(raw.levels[1].result.attempts);
   d3.select('.experiment-start').text(start);
