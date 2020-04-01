@@ -336,7 +336,6 @@ function setupCharts() {
   const $sel = d3.select(this);
   const condition = $sel.attr('data-type');
   const specificData = filterData(condition);
-
   const chart = $sel.data([specificData]).noteChart();
   chart.resize().render();
   charts[condition] = chart;
@@ -374,6 +373,7 @@ function setupDropdown(data) {
       title: song.title,
       tempo: song.tempo,
       sig: song.sig,
+      swap: song.swap,
       result: { recent: [] },
     };
 
