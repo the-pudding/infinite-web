@@ -123,3 +123,24 @@ figure
 .figure__stop
 	visibility hidden
 	height 1px
+
+#method
+	margin 0 auto
+	padding 1rem
+
+	> *
+		max-width $column-width
+
+	p
+		margin 1.5rem auto
+		set-type-size(small, false)
+
+		&:first-of-type
+			margin-bottom 3rem
+			padding 1em
+			background-color $highlight
+			font-weight bold
+
+		+mq('bp-4')
+			set-type-size(large, false)
+			line-height 1.5
