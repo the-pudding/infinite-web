@@ -252,10 +252,14 @@ function findChartSpecifics(condition) {
 }
 
 function setupEnterView() {
+  // this puts an invisible element below the piano graphic
+  // when it hits the top of the screen (graphic out of view)
+  // it turns off the graphic (since exit only applies to upward)
   EnterView({
     selector: '.figure__stop',
     enter(el) {
       const condition = d3.select(el).attr('data-type');
+      console.log('enter - stop', condition);
       stop(condition);
     },
     offset: 1,
@@ -265,6 +269,7 @@ function setupEnterView() {
     selector: '.figure__piano',
     enter(el) {
       const condition = d3.select(el).attr('data-type');
+      console.log('enter', condition);
       stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
@@ -273,6 +278,7 @@ function setupEnterView() {
     },
     exit(el) {
       const condition = d3.select(el).attr('data-type');
+      console.log('exit', condition);
       stop(condition);
     },
     offset: 0.7,
