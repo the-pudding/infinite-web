@@ -55,4 +55,8 @@ function init(cb) {
   }).toMaster();
 }
 
-export default { init, play, stop, clickKey, mute };
+function checkStatus() {
+  return Tone.context.state;
+}
+
+export default { init, play, stop, clickKey, mute, checkStatus };
