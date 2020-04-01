@@ -15,7 +15,7 @@ const charts = {};
 let data = [];
 let crosswalk = [];
 let cwMapNote = [];
-
+let status = Audio.checkStatus();
 let generatedData = {};
 
 // keep track of how far into this, the live chart has gone
@@ -57,6 +57,11 @@ function findDuration(tempo, duration) {
 }
 
 function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
+  if (condition === 'live') {
+    const resultLength = thisData.result.recent.map(d => d.length);
+    console.log({ resultLength });
+  }
+
   const resultLength = thisData.result.recent.length;
   // add note data to played tones
   thisData.result.recent.forEach(seq => {
@@ -135,6 +140,8 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
         // this runs for every note played
         // find the next note that needs to be played
         const note = val[notesPlayed];
+        status = Audio.checkStatus();
+        checkSuspendedAudio();
 
         // adjust the number of notes now played
         notesPlayed += 1;
@@ -309,6 +316,7 @@ function setupRestartButtons() {
       return d3.select(n[i]).attr('data-type') === 'all';
     })
     .text('Generate Attempt');
+
   $buttons.on('click', function() {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
@@ -410,6 +418,12 @@ function setupNoteMap() {
   cwMapNote = new Map(cwData);
 }
 
+function checkSuspendedAudio() {
+  if (status === 'suspended') {
+    $buttons.html(`Play <img inline src='play.svg'>`);
+  } else $buttons.html(`Replay <img inline src='refresh-ccw.svg'>`);
+}
+
 function init({ levels, cw }) {
   data = levels;
   crosswalk = cw;
@@ -420,6 +434,7 @@ function init({ levels, cw }) {
     setupEnterView();
     setupRestartButtons();
     setupDropdown(data);
+    checkSuspendedAudio();
   });
 }
 
