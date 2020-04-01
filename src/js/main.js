@@ -41,8 +41,8 @@ function begin(data) {
   results.init(data);
   clock.init(data);
   probability.init();
-  footer.init();
   $main.classed('is-ready', true);
+  footer.init();
 }
 function init() {
   // adds rel="noopener" to all target="_blank" links
