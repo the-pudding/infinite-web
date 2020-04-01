@@ -11,6 +11,7 @@ function setupChart() {
   const c = choices[t];
   const data = d3.range(len).map(d => Math.pow(c, d + 1));
   const $div = $chart
+    .select('.figure__inner')
     .selectAll('div')
     .data(data)
     .join('div');
