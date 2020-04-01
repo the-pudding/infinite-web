@@ -4,6 +4,7 @@ import EnterView from 'enter-view';
 import Audio from './audio';
 import GenerateSequence from './generate-sequence';
 import './pudding-chart/notes';
+import replaySvg from './replay-svg';
 
 const $article = d3.select('article');
 const $pianos = $article.selectAll('.figure__piano');
@@ -15,8 +16,9 @@ const charts = {};
 let data = [];
 let crosswalk = [];
 let cwMapNote = [];
-let status = Audio.checkStatus();
 let generatedData = {};
+
+let statusDone = false;
 
 // keep track of how far into this, the live chart has gone
 let liveChartCount = 0;
@@ -140,7 +142,6 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
         // this runs for every note played
         // find the next note that needs to be played
         const note = val[notesPlayed];
-        status = Audio.checkStatus();
         checkSuspendedAudio();
 
         // adjust the number of notes now played
@@ -419,9 +420,13 @@ function setupNoteMap() {
 }
 
 function checkSuspendedAudio() {
-  if (status === 'suspended') {
-    $buttons.html(`Play <img inline src='play.svg'>`);
-  } else $buttons.html(`Replay <img inline src='refresh-ccw.svg'>`);
+  if (!statusDone) {
+    const status = Audio.checkStatus();
+    if (status !== 'suspended') {
+      $buttons.html(`Replay ${replaySvg}`);
+      statusDone = true;
+    }
+  }
 }
 
 function init({ levels, cw }) {
