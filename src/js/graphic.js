@@ -18,9 +18,9 @@ function resize() {
   // Piano.resize();
 }
 
-function toggleAudio() {
+function toggleAudio(dir) {
   const isOn = $header.select('.audio .on').classed('is-visible');
-  const goOn = !isOn;
+  const goOn = dir ? dir === 'on' : !isOn;
   const over = goOn ? 'on. Good choice.' : 'off.';
   $intro.select('.intro__overline span').text(over);
   $header.select('.on').classed('is-visible', goOn);
