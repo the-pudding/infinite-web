@@ -53,8 +53,11 @@ function findKeys({ range, crosswalk }) {
     Math.max(...uniqueOctaves) + 1
   );
 
-  const keys = crosswalk.filter(d => allOctaves.includes(d.octave));
+  let keys = crosswalk.filter(d => allOctaves.includes(d.octave));
   if (rest === true) keys.push({ midi: 0, note: 'rest', sharp: false });
+  // if full keyboard, no need to include every octave
+  if (midisSorted.length === 49)
+    keys = keys.filter(d => midisSorted.includes(d.midi));
 
   return keys;
 }
