@@ -5,9 +5,11 @@ import midiToNotation from './midi-to-notation';
 let sampler;
 let part = new Tone.Part(() => {}, []);
 Tone.Master.mute = true;
+let current;
 
-function stop() {
-  Tone.Transport.stop();
+function stop(chart) {
+  // console.log({ current, chart });
+  if (!chart || current === chart) Tone.Transport.stop();
 }
 
 function mute(condition) {
@@ -30,6 +32,7 @@ function clickKey(midi) {
 
 function play({ sequence, tempo, swapFn, noteCallback, condition }) {
   stop();
+  current = condition;
   part.removeAll();
   const s = sequence.map(d => ({ midi: d[0], duration: swapFn(d[1]) }));
   const results = midiToNotation(s);

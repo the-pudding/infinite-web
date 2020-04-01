@@ -21,9 +21,10 @@ let generatedData = {};
 // keep track of how far into this, the live chart has gone
 let liveChartCount = 0;
 
-function stop() {
-  Audio.stop();
-  Object.keys(charts).forEach(c => charts[c].clear());
+function stop(chart) {
+  Audio.stop(chart);
+  if (chart && charts[chart]) charts[chart].clear();
+  else Object.keys(charts).forEach(c => charts[c].clear());
 }
 
 function filterData(condition) {
@@ -252,23 +253,29 @@ function findChartSpecifics(condition) {
 
 function setupEnterView() {
   EnterView({
+    selector: '.figure__stop',
+    enter(el) {
+      const condition = d3.select(el).attr('data-type');
+      stop(condition);
+    },
+    offset: 1,
+  });
+
+  EnterView({
     selector: '.figure__piano',
     enter(el) {
       const condition = d3.select(el).attr('data-type');
-      console.log('enter', condition);
       stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
         findChartSpecifics(condition);
       }
     },
-    exit() {
+    exit(el) {
       const condition = d3.select(el).attr('data-type');
-      console.log('exit', condition);
-      stop();
+      stop(condition);
     },
     offset: 0.7,
-    once: false,
   });
 }
 function handleAllClick(btn) {
@@ -299,10 +306,8 @@ function setupRestartButtons() {
   $buttons.on('click', function() {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
-    const chart = charts[type];
     if (type === 'live') liveChartCount = 0;
     stop();
-    chart.clear();
     if (type === 'all') {
       handleAllClick('generate');
     } else findChartSpecifics(type);
@@ -315,7 +320,6 @@ function setupRestartButtons() {
 
   $closest.on('click', () => {
     stop();
-    charts.live.clear();
 
     // find which songs already have results
     const hasResults = data.levels.filter(d => d.result);

@@ -7,7 +7,7 @@
 	<select class='figure__dropdown'></select>
 	{{/if}}
 	{{#if graphic}}
-	<figure class='figure__{{graphic}}' data-type={{{type}}}>
+	<figure class='figure__{{graphic}}' data-type={{type}}>
 		<p class="figure__overline is-visible"><button class='btn'>Enable Audio</button></p>
 		<div class='figure__inner'>
 			<button class='btn figure__restart' data-type={{{type}}}>Replay <img inline src='refresh-ccw.svg'></button>
@@ -19,6 +19,7 @@
 			{{/ifEquals}}
 		</div>
 	</figure>
+	<div class='figure__stop' data-type={{type}}></div>
 	{{/if}}
 
 	{{#if odds }}
