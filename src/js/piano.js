@@ -240,7 +240,6 @@ function findChartSpecifics(condition) {
       condition,
     });
   } else {
-    console.log({ rend, thisData });
     playChart({
       chart: rend,
       thisData,
@@ -255,8 +254,8 @@ function setupEnterView() {
   EnterView({
     selector: '.figure__piano',
     enter(el) {
-      // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
+      console.log('enter', condition);
       stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
@@ -264,6 +263,8 @@ function setupEnterView() {
       }
     },
     exit() {
+      const condition = d3.select(el).attr('data-type');
+      console.log('exit', condition);
       stop();
     },
     offset: 0.7,
