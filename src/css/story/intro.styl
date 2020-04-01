@@ -4,6 +4,20 @@
 	max-width $column-width
 	text-align center
 
+	&__hed
+		position absolute
+		top 4rem
+		left 3rem
+		display none
+		max-width 12rem
+		text-align left
+		font-weight bold
+		set-type-size(xxx-large, false)
+		line-height 1
+
+		+mq('bp-7')
+			display block
+
 	&__byline
 		background-color $highlight
 		set-type-size(small)
