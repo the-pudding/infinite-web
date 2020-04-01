@@ -234,7 +234,6 @@ d3.selection.prototype.noteChart = function init(options) {
         // create a key map
         const keyCoord = placementData.map(d => [d.midi, d.coord]);
         keyMap = new Map(keyCoord);
-
         // append the piano
         // first append a group for each key
         const $keyGroup = $vis
@@ -396,11 +395,26 @@ d3.selection.prototype.noteChart = function init(options) {
               .attr('height', whiteWidth)
               .classed('is-correct', (d, i) => isCorrect(d, i));
 
-            group
-              .append('text')
-              .text(d => d[2])
-              .attr('alignment-baseline', 'middle')
-              .attr('transform', `translate(2, ${whiteWidth / 2})`);
+            if (scaleGuideBlock.range()[0] > 22 && whiteWidth > 22) {
+              group
+                .append('text')
+                .text(d => {
+                  if (
+                    ['animated', 'success', 'beethoven2'].includes(thisChart) &&
+                    d[2] === 'D#'
+                  )
+                    return 'E♭';
+                  return d[2];
+                })
+                .attr('alignment-baseline', 'middle')
+                .attr('text-anchor', 'middle')
+                .attr(
+                  'transform',
+                  d =>
+                    `translate(${scaleGuideBlock(2 ** d[1]) / 2}, ${whiteWidth /
+                      2})`
+                );
+            }
 
             group
               .transition()
@@ -465,9 +479,10 @@ d3.selection.prototype.noteChart = function init(options) {
             .text(`Attempt #${attempt}`)
             .attr(
               'transform',
-              `translate(${width - whiteHeight}, ${keyboardHeight +
+              `translate(${width - whiteHeight / 2}, ${keyboardHeight +
                 whiteWidth / 2} )`
             )
+            .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
             .style('opacity', 0)
             .transition()
