@@ -423,7 +423,10 @@ function checkSuspendedAudio() {
   if (!statusDone) {
     const status = Audio.checkStatus();
     if (status !== 'suspended') {
-      $buttons.html(`Replay ${replaySvg}`);
+      $buttons.html((d, i) => {
+        const pre = i === $buttons.size() - 1 ? 'Generate' : 'Replay';
+        return `${pre} ${replaySvg}`;
+      });
       statusDone = true;
     }
   }
