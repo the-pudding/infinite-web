@@ -119,6 +119,10 @@ function insertText(raw) {
     11,
     15
   )}`;
+  const est =
+    current.estimate === 'Anytime now...'
+      ? 'anytime now'
+      : `in the next ${current.estimate} or so.`;
   d3.select('.beethoven-attempts').text(raw.levels[0].result.attempts);
   d3.select('.beethoven2-attempts').text(raw.levels[1].result.attempts);
   d3.select('.experiment-start').text(start);
@@ -126,7 +130,7 @@ function insertText(raw) {
     d3.select('.current-song').html(
       `<strong>${current.title} by ${current.artist}</strong>`
     );
-    d3.select('.current-estimate').html(current.estimate);
+    d3.select('.current-estimate').html(est);
   } else console.log('no current song');
 }
 
