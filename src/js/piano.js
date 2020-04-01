@@ -293,6 +293,7 @@ function setupRestartButtons() {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
     const chart = charts[type];
+    if (type === 'live') liveChartCount = 0;
     Audio.stop();
     chart.clear();
     if (type === 'all') {
