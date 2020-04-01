@@ -21,6 +21,11 @@ let generatedData = {};
 // keep track of how far into this, the live chart has gone
 let liveChartCount = 0;
 
+function stop() {
+  Audio.stop();
+  Object.keys(charts).forEach(c => charts[c].clear());
+}
+
 function filterData(condition) {
   let specificData = null;
   // separate out phases for the first few steps which repeat the same piano
@@ -234,7 +239,8 @@ function findChartSpecifics(condition) {
       staticSeq: [Math.max(liveChartCount - 10, 0), liveChartCount],
       condition,
     });
-  } else
+  } else {
+    console.log({ rend, thisData });
     playChart({
       chart: rend,
       thisData,
@@ -242,6 +248,7 @@ function findChartSpecifics(condition) {
       staticSeq: [0, 0],
       condition,
     });
+  }
 }
 
 function setupEnterView() {
@@ -250,17 +257,16 @@ function setupEnterView() {
     enter(el) {
       // select the currently entered chart and update/play it
       const condition = d3.select(el).attr('data-type');
-      Audio.stop();
+      stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
-        charts[condition].clear();
         findChartSpecifics(condition);
       }
     },
-    exit(el) {
-      Audio.stop();
+    exit() {
+      stop();
     },
-    offset: 0.6,
+    offset: 0.7,
     once: false,
   });
 }
@@ -294,7 +300,7 @@ function setupRestartButtons() {
     const type = clicked.attr('data-type');
     const chart = charts[type];
     if (type === 'live') liveChartCount = 0;
-    Audio.stop();
+    stop();
     chart.clear();
     if (type === 'all') {
       handleAllClick('generate');
@@ -307,7 +313,7 @@ function setupRestartButtons() {
   });
 
   $closest.on('click', () => {
-    Audio.stop();
+    stop();
     charts.live.clear();
 
     // find which songs already have results
@@ -364,7 +370,7 @@ function setupDropdown(data) {
   };
 
   dd.on('change', function() {
-    Audio.stop();
+    stop();
     const sel = d3.select(this).property('value');
 
     const song = data.levels.find(d => d.title === sel);
