@@ -63,6 +63,7 @@ function init({ levels }) {
     .attr('data-title', 'Est. Completion')
     .text(d => {
       if (d.result && d.result.done) return `Finished ${getDate(d.result.end)}`;
+      if (d.result) return d.estimate;
       return `In ${d.estimate}`;
     });
 
