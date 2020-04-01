@@ -1,12 +1,10 @@
 {
-	"title": "Title Case Hed Goes Here",
-	"description": "Sentence case dek goes down here. Modify these in data/meta.json.",
 	"site": "https://pudding.cool",
 	"siteName": "The Pudding",
-	"url": "https://pudding.cool/year/month/name/",
-	"keywords": "tk",
-	"imgFacebook": "https://pudding.cool/year/month/name/assets/social/social-facebook.jpg",
-	"imgTwitter": "https://pudding.cool/year/month/name/assets/social/social-twitter.jpg",
+	"url": "https://pudding.cool/year/2020/04/infinite/",
+	"keywords": "infinite, monkey, music, probability, explainer, Joe Rogan",
+	"imgFacebook": "https://pudding.cool/year/2020/04/infinite/assets/social/social-facebook.jpg",
+	"imgTwitter": "https://pudding.cool/year/2020/04/infinite/assets/social/social-twitter.jpg",
 	"author": {
 		"first": "Russell",
 		"name": "Russell Goldenberg",
@@ -18,6 +16,5 @@
 		"name": "Amber Thomas",
 		"url": "https://pudding.cool/author/amber-thomas"
 	},
-	"analytics": "",
-	"lorem": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis neque sit amet sollicitudin vehicula. Maecenas fringilla mi non lacus mattis elementum. Curabitur dignissim faucibus justo."
+	"analytics": "UA-90567923-1"
 }
