@@ -259,7 +259,7 @@ function setupEnterView() {
     selector: '.figure__stop',
     enter(el) {
       const condition = d3.select(el).attr('data-type');
-      console.log('enter - stop', condition);
+      console.log('enter - stop ....', condition);
       stop(condition);
     },
     offset: 1,
@@ -269,7 +269,7 @@ function setupEnterView() {
     selector: '.figure__piano',
     enter(el) {
       const condition = d3.select(el).attr('data-type');
-      console.log('enter', condition);
+      console.log('enter - piano ...', condition);
       stop();
       if (condition !== 'all' && condition !== 'two') {
         // no enter view for select chart
@@ -278,7 +278,7 @@ function setupEnterView() {
     },
     exit(el) {
       const condition = d3.select(el).attr('data-type');
-      console.log('exit', condition);
+      console.log('exit  - piano ...', condition);
       stop(condition);
     },
     offset: 0.7,
