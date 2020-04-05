@@ -476,7 +476,7 @@ d3.selection.prototype.noteChart = function init(options) {
           $justFinished
 
             .append('text')
-            .text(`Attempt #${attempt}`)
+            .text(`#${attempt}`)
             .attr(
               'transform',
               `translate(${width - whiteHeight / 2}, ${keyboardHeight +
