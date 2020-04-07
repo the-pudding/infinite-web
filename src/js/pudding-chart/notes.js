@@ -367,11 +367,13 @@ d3.selection.prototype.noteChart = function init(options) {
         const $seq = $group
           .selectAll('.sequence')
           .data(sequenceProgress, d => d.index)
-          .join(enter =>
-            enter
-              .append('g')
-              .attr('class', 'sequence')
-              .attr('data-order', d => d.index)
+          .join(
+            enter =>
+              enter
+                .append('g')
+                .attr('class', 'sequence')
+                .attr('data-order', d => d.index)
+            // .classed('finished', jump === true);
           );
 
         const $noteGroup = $seq
