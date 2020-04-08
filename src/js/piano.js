@@ -23,11 +23,15 @@ let statusDone = false;
 // keep track of how far into this, the live chart has gone
 let liveChartCount = 0;
 
+let pauseTimeout = null;
+
 function stop(chart) {
   Audio.stop(chart);
-  if (chart && charts[chart]) charts[chart].clear();
-  else {
-    console.log({ charts });
+  if (chart && charts[chart]) {
+    charts[chart].clear();
+    clearTimeout(pauseTimeout);
+  } else {
+    // console.log({ charts });
     Object.keys(charts).forEach(c => charts[c].clear());
   }
 }
@@ -168,7 +172,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
           if (condition === 'live') {
             // are we at the end?
             const end = liveChartCount + 1 === maxSequences[1];
-            console.log({ liveChartCount, max: maxSequences[1], end });
+            // console.log({ liveChartCount, max: maxSequences[1], end });
             if (end === true) liveChartCount = 0;
             else liveChartCount += 1;
           }
@@ -181,7 +185,7 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
 
           // if we haven't hit the last sequence, do this again
           if (seqIndex < sequences.length)
-            setTimeout(() => playNextSequence(), finalDuration + 500);
+            pauseTimeout = setTimeout(playNextSequence, finalDuration + 500);
         }
       },
     });
@@ -244,8 +248,6 @@ function findChartSpecifics(condition) {
     const toCut = liveChartCount < 10;
     const totalAttempts = thisData.result.recent.length;
     // in case it reached the end
-    if (liveChartCount === totalAttempts) console.log('equal!');
-    console.log({ liveChartCount, toCut });
     playChart({
       chart: rend,
       thisData,
@@ -328,8 +330,8 @@ function setupRestartButtons() {
   $buttons.on('click', function() {
     const clicked = d3.select(this);
     const type = clicked.attr('data-type');
+    stop(type);
     if (type === 'live') liveChartCount = 0;
-    stop();
     if (type === 'all') {
       handleAllClick('generate');
     } else findChartSpecifics(type);
@@ -341,7 +343,7 @@ function setupRestartButtons() {
   });
 
   $closest.on('click', () => {
-    stop();
+    stop('live');
 
     // find which songs already have results
     const hasResults = data.levels.filter(d => d.result);
