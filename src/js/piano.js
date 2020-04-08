@@ -26,7 +26,10 @@ let liveChartCount = 0;
 function stop(chart) {
   Audio.stop(chart);
   if (chart && charts[chart]) charts[chart].clear();
-  else Object.keys(charts).forEach(c => charts[c].clear());
+  else {
+    console.log({ charts });
+    Object.keys(charts).forEach(c => charts[c].clear());
+  }
 }
 
 function filterData(condition) {
@@ -162,7 +165,13 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
           seqIndex += 1;
 
           // if this is the live chart, update the live chart count
-          if (condition === 'live') liveChartCount += 1;
+          if (condition === 'live') {
+            // are we at the end?
+            const end = liveChartCount + 1 === maxSequences[1];
+            console.log({ liveChartCount, max: maxSequences[1], end });
+            if (end === true) liveChartCount = 0;
+            else liveChartCount += 1;
+          }
 
           // start back at 0
           notesPlayed = 0;
@@ -234,6 +243,9 @@ function findChartSpecifics(condition) {
   else if (condition === 'live') {
     const toCut = liveChartCount < 10;
     const totalAttempts = thisData.result.recent.length;
+    // in case it reached the end
+    if (liveChartCount === totalAttempts) console.log('equal!');
+    console.log({ liveChartCount, toCut });
     playChart({
       chart: rend,
       thisData,
