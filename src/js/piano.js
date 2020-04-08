@@ -152,6 +152,8 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
         // add this note to the sequence progress array
         const thisSeq = sequenceProgress.filter(d => d.index === seqIndex);
 
+        console.log({ val, notesPlayed });
+
         thisSeq[0].notes.push(note);
 
         // send the new note data to be updated
