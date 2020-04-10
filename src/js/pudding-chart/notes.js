@@ -479,8 +479,9 @@ d3.selection.prototype.noteChart = function init(options) {
         // .attr('y', keyboardHeight);
 
         // add count if condition  is 'live'
-        if (thisChart === 'live') {
-          const attempt = $justFinished.data()[0].attempts;
+        if (['live', 'animated', 'success', 'beethoven2'].includes(thisChart)) {
+          const attempt =
+            thisChart === 'animated' ? 1 : $justFinished.data()[0].attempts + 1;
 
           $justFinished
 
