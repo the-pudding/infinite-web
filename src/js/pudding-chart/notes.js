@@ -358,7 +358,11 @@ d3.selection.prototype.noteChart = function init(options) {
           .attr('x', -width);
       },
       clear() {
-        $vis.selectAll('.sequence').remove();
+        $vis.selectAll('.note').interrupt();
+        $vis
+          .selectAll('.sequence')
+          .interrupt()
+          .remove();
       },
       update({ sequenceProgress, jump, condition }) {
         const ANIMATION_DURATION = jump ? 0 : 50;
@@ -430,19 +434,22 @@ d3.selection.prototype.noteChart = function init(options) {
             // highlight played key
             const noteData = group.data();
 
-            const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
-              const midi = +d3.select(n[i]).attr('data-midi');
-              const played = noteData[0][0];
-              return midi === played;
-            });
+            // check to make sure data exists
+            if (noteData[0]) {
+              const $playedKey = $vis.selectAll('.key').filter((d, i, n) => {
+                const midi = +d3.select(n[i]).attr('data-midi');
+                const played = noteData[0][0];
+                return midi === played;
+              });
 
-            $playedKey
-              .transition()
-              .duration(100)
-              .style('fill', d => KEY_COLOR)
-              .transition()
-              .duration(100)
-              .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+              $playedKey
+                .transition()
+                .duration(100)
+                .style('fill', d => KEY_COLOR)
+                .transition()
+                .duration(100)
+                .style('fill', d => (d.sharp === true ? '#000' : '#fff'));
+            }
           });
       },
       moveSequence({ index, jump, duration }) {
