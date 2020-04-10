@@ -123,17 +123,14 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
     });
   }
 
-  // handle start sequence, and moving on to new sequences
-  let notesPlayed = 0;
-
-  const playNextSequence = () => {
+  const playNextSequence = si => {
     sequenceProgress.push({
-      index: seqIndex,
+      index: si,
       notes: [],
-      attempts: attempts - resultLength + maxSequences[0] + seqIndex,
+      attempts: attempts - resultLength + maxSequences[0] + si,
     });
 
-    const sequence = sequences[seqIndex];
+    const sequence = sequences[si];
     Audio.play({
       chart,
       sequence,
@@ -142,33 +139,40 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
       condition,
       noteCallback: val => {
         // this runs for every note played
-        // find the next note that needs to be played
-        const note = val[notesPlayed];
-        checkSuspendedAudio();
-
-        // adjust the number of notes now played
-        notesPlayed += 1;
 
         // add this note to the sequence progress array
-        const thisSeq = sequenceProgress.filter(d => d.index === seqIndex);
+        const thisSeq = sequenceProgress.filter(d => d.index === si);
+        // find the next note that needs to be played
+        const notesPlayed = thisSeq[0].notes.length;
+        const note = val[notesPlayed];
 
-        console.log({ val, notesPlayed });
+        // check the status only if it's currently false
+        if (!statusDone) checkSuspendedAudio();
 
-        thisSeq[0].notes.push(note);
+        // find the length of the entire sequence
+        const seqLength = val.length;
+
+        // adjust the number of notes now played
+        // notesPlayed += 1;
+
+        // only add new notes if they haven't all already been added
+        if (notesPlayed < seqLength) thisSeq[0].notes.push(note);
+
+        const noteLength = thisSeq[0].notes.length;
 
         // send the new note data to be updated
         chart.update({ sequenceProgress, jump: false, condition });
 
         // check if this was the last note of the sequence
-        if (notesPlayed === val.length) {
+        if (note && noteLength === seqLength) {
           const finalDuration = findDuration(tempo, note[1]);
           chart.moveSequence({
-            index: seqIndex,
+            index: si,
             jump: false,
             duration: finalDuration,
           });
           // move onto the next sequence
-          seqIndex += 1;
+          seqIndex = si + 1;
 
           // if this is the live chart, update the live chart count
           if (condition === 'live') {
@@ -179,21 +183,22 @@ function playChart({ chart, thisData, maxSequences, staticSeq, condition }) {
             else liveChartCount += 1;
           }
 
-          // start back at 0
-          notesPlayed = 0;
           // make sure that sequenceProgress never has more than 10 items in it
           const progressLength = sequenceProgress.length;
           if (progressLength > DOM_CUTOFF) sequenceProgress.shift();
 
           // if we haven't hit the last sequence, do this again
-          if (seqIndex < sequences.length)
-            pauseTimeout = setTimeout(playNextSequence, finalDuration + 500);
+          if (si + 1 < sequences.length)
+            pauseTimeout = setTimeout(
+              () => playNextSequence(si + 1),
+              finalDuration + 500
+            );
         }
       },
     });
   };
 
-  playNextSequence();
+  playNextSequence(seqIndex);
 }
 
 function makeKeysClickable() {
