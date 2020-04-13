@@ -1,10 +1,10 @@
 {
 	"site": "https://pudding.cool",
 	"siteName": "The Pudding",
-	"url": "https://pudding.cool/year/2020/04/infinite/",
+	"url": "https://pudding.cool/2020/04/infinite/",
 	"keywords": "infinite, monkey, music, probability, explainer, Joe Rogan",
-	"imgFacebook": "https://pudding.cool/year/2020/04/infinite/assets/social/social-facebook.jpg",
-	"imgTwitter": "https://pudding.cool/year/2020/04/infinite/assets/social/social-twitter.jpg",
+	"imgFacebook": "https://pudding.cool/2020/04/infinite/assets/social/social-facebook.jpg",
+	"imgTwitter": "https://pudding.cool/2020/04/infinite/assets/social/social-twitter.jpg",
 	"author": {
 		"first": "Russell",
 		"name": "Russell Goldenberg",
