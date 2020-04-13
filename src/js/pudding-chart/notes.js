@@ -482,11 +482,11 @@ d3.selection.prototype.noteChart = function init(options) {
         if (['live', 'animated', 'success', 'beethoven2'].includes(thisChart)) {
           const attempt =
             thisChart === 'animated' ? 1 : $justFinished.data()[0].attempts + 1;
-
+          const t = `#${attempt}`;
+          const fs = Math.min(12, Math.floor((whiteHeight * 1.67) / t.length));
           $justFinished
-
             .append('text')
-            .text(`#${attempt}`)
+            .text(t)
             .attr(
               'transform',
               `translate(${width - whiteHeight / 2}, ${keyboardHeight +
@@ -498,7 +498,8 @@ d3.selection.prototype.noteChart = function init(options) {
             .transition()
             .delay(ANIMATION_DELAY)
             .duration(0)
-            .style('opacity', 1);
+            .style('opacity', 1)
+            .style('font-size', `${fs}px`);
         }
 
         const $allFinished = $vis.selectAll('.finished').nodes();
