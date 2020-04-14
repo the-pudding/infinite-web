@@ -448,8 +448,37 @@ function checkSuspendedAudio() {
   }
 }
 
+function updateDuration(seq, swap) {
+  const updatedSeq = seq.map(d => {
+    const { midi } = d;
+    let dur = null;
+    if (!swap) dur = d.duration;
+    else {
+      const [f, r] = swap.split('-').map(v => +v);
+      dur = d.duration === f ? r : d.duration;
+    }
+    return { midi, duration: dur };
+  });
+  return updatedSeq;
+}
+
+function cleanData(lev) {
+  const l = lev.levels.map(level => {
+    const cleaned = {
+      ...level,
+      sequence: updateDuration(level.sequence, level.swap),
+    };
+    return cleaned;
+  });
+
+  return {
+    ...lev,
+    levels: l,
+  };
+}
+
 function init({ levels, cw }) {
-  data = levels;
+  data = cleanData(levels);
   crosswalk = cw;
   setupNoteMap();
   Audio.init(() => {
