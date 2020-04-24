@@ -52,7 +52,7 @@ function init({ levels }) {
     .text(d => d.artist);
   $tr
     .append('td')
-    .attr('data-title', 'Odds')
+    .attr('data-title', 'Probability')
     .text((d, i) => `${i === 0 ? '1 in ' : ''}${format(d.odds)}`);
   $tr
     .append('td')
